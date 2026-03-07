@@ -17,33 +17,26 @@ export default function Home() {
     {
       id: 1,
       icon: Plane,
-      title: "Travel Planning",
-      description: "Custom itineraries, dream destinations, budget adventures — let us craft your perfect trip from start to finish.",
+      title: "Travel & Lifestyle Hub",
+      description: "Flights, hotels, car rentals, cruises, wellness retreats, adventure activities, fine dining, sports tickets, concert tickets, and unforgettable experiences — all integrated in one place.",
       color: "from-amber-400 to-orange-400"
     },
     {
       id: 2,
-      icon: Sparkles,
-      title: "Leisure & Experiences",
-      description: "Exclusive events, wellness retreats, entertainment bookings, and unique leisure activities tailored to you.",
-      color: "from-rose-400 to-pink-400"
-    },
-    {
-      id: 3,
       icon: Code,
       title: "Freelance Solutions",
       description: "Connect with top talent or find gigs — web design, writing, consulting, creative work, and beyond.",
       color: "from-blue-400 to-cyan-400"
     },
     {
-      id: 4,
+      id: 3,
       icon: DollarSign,
       title: "Loan Brokering",
       description: "Competitive rates, personalized options — we broker loans for personal, business, travel, or investment needs.",
       color: "from-emerald-400 to-teal-400"
     },
     {
-      id: 5,
+      id: 4,
       icon: Zap,
       title: "And Much More...",
       description: "Consulting, partnerships, custom projects — if it's ambitious and exciting, Benny's Emporium has you covered.",

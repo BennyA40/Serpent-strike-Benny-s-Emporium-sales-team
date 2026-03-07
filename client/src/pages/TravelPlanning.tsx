@@ -1,49 +1,83 @@
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, MapPin, Plane, Hotel, Ship, Calendar, Users, DollarSign, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, MapPin, Plane, Hotel, Ship, Calendar, Users, DollarSign, CheckCircle2, Ticket, Utensils, Dumbbell, Music, Car, Heart } from "lucide-react";
 import { Link } from "wouter";
 import { useState } from "react";
 
 /* Design System: Modern Luxury Marketplace
-   - Travel Planning Detail Page
-   - Rich imagery showcasing destinations, accommodations, and experiences
-   - Booking integration with IntelliTravel portal
-   - Service highlights and testimonials
+   - Travel & Lifestyle Hub - Comprehensive Platform
+   - Flights, Hotels, Car Rentals, Cruises
+   - Wellness Retreats, Adventure Activities, Cultural Tours
+   - Fine Dining, Entertainment, Sports Tickets, Concert Tickets
+   - All integrated throughout package offerings
 */
 
 export default function TravelPlanning() {
-  const [activeTab, setActiveTab] = useState<'flights' | 'hotels' | 'cruises'>('flights');
+  const [activeTab, setActiveTab] = useState<'all' | 'flights' | 'hotels' | 'cruises' | 'experiences'>('all');
 
-  const travelPackages = [
+  const comprehensivePackages = [
     {
       id: 1,
-      name: "European River Cruise",
-      description: "Luxury river cruise through Europe's most scenic waterways",
+      name: "European River Cruise & Wellness Retreat",
+      description: "Luxury river cruise through Europe's scenic waterways with integrated spa and wellness activities",
       price: "From $2,499",
       image: "https://d2xsxph8kpxj0f.cloudfront.net/310519663342087978/hpMFvQgt7mSt3LmbrDcdGW/river-cruise_10b3e896.jpg",
       duration: "7-10 days",
-      highlights: ["All-inclusive meals", "Expert guides", "Shore excursions"]
+      category: "cruises",
+      highlights: ["All-inclusive meals", "Expert guides", "Shore excursions", "Spa & wellness", "Cultural tours"]
     },
     {
       id: 2,
-      name: "Luxury Resort Escape",
-      description: "5-star resort experiences in paradise destinations",
+      name: "Luxury Resort Escape with Entertainment",
+      description: "5-star resort experiences in paradise with concert tickets, fine dining, and adventure activities",
       price: "From $1,899",
       image: "https://d2xsxph8kpxj0f.cloudfront.net/310519663342087978/hpMFvQgt7mSt3LmbrDcdGW/hotel-luxury_4159c6ef.jpg",
       duration: "5-7 days",
-      highlights: ["Premium accommodations", "Spa & wellness", "Fine dining"]
+      category: "hotels",
+      highlights: ["Premium accommodations", "Concert & entertainment", "Fine dining", "Spa & wellness", "Adventure activities"]
     },
     {
       id: 3,
-      name: "Global Flight Network",
-      description: "Access to flights worldwide through trusted partners",
+      name: "Global Flight Network with Ground Services",
+      description: "Access to flights worldwide with car rentals, hotel bookings, and local experience packages",
       price: "Competitive rates",
       image: "https://d2xsxph8kpxj0f.cloudfront.net/310519663342087978/hpMFvQgt7mSt3LmbrDcdGW/airport-modern_c09a6d9b.jpg",
       duration: "Flexible",
-      highlights: ["Best prices", "Flexible dates", "24/7 support"]
+      category: "flights",
+      highlights: ["Best prices", "Flexible dates", "24/7 support", "Car rentals included", "Hotel partnerships"]
+    },
+    {
+      id: 4,
+      name: "Sports & Concert Experience Package",
+      description: "Premium tickets to major sporting events and concerts worldwide with VIP accommodations",
+      price: "From $1,299",
+      image: "https://d2xsxph8kpxj0f.cloudfront.net/310519663342087978/hpMFvQgt7mSt3LmbrDcdGW/opportunity-pattern-eigGZCbrRpNao8P5pB6828.webp",
+      duration: "3-5 days",
+      category: "experiences",
+      highlights: ["VIP event tickets", "Premium seating", "Hotel near venue", "Ground transportation", "Meet & greet options"]
+    },
+    {
+      id: 5,
+      name: "Adventure & Cultural Immersion",
+      description: "Active adventures, cultural tours, and local experiences with professional guides and accommodations",
+      price: "From $1,599",
+      image: "https://d2xsxph8kpxj0f.cloudfront.net/310519663342087978/hpMFvQgt7mSt3LmbrDcdGW/travel-service-visual-FzssFG3yvmGZbhhYniXQD3.webp",
+      duration: "6-8 days",
+      category: "experiences",
+      highlights: ["Guided adventures", "Cultural immersion", "Local cuisine", "Professional guides", "Small group tours"]
+    },
+    {
+      id: 6,
+      name: "Culinary & Fine Dining Tour",
+      description: "Michelin-starred restaurants, cooking classes, wine tastings, and gourmet experiences worldwide",
+      price: "From $2,199",
+      image: "https://d2xsxph8kpxj0f.cloudfront.net/310519663342087978/hpMFvQgt7mSt3LmbrDcdGW/service-cards-bg-665dGpUCZGo2npWxSiPpaS.webp",
+      duration: "5-7 days",
+      category: "experiences",
+      highlights: ["Michelin-starred dining", "Cooking classes", "Wine tastings", "Chef-led experiences", "Luxury accommodations"]
     }
   ];
 
-  const features = [
+  const services = [
     {
       icon: Plane,
       title: "Flight Booking",
@@ -55,14 +89,44 @@ export default function TravelPlanning() {
       description: "Access thousands of hotels from budget-friendly to luxury 5-star properties across the globe."
     },
     {
+      icon: Car,
+      title: "Car Rentals",
+      description: "Rent vehicles at competitive rates with flexible terms and worldwide coverage."
+    },
+    {
       icon: Ship,
       title: "Cruise Packages",
       description: "Explore all-inclusive cruise experiences with expert itineraries and premium accommodations."
     },
     {
+      icon: Dumbbell,
+      title: "Wellness & Adventure",
+      description: "Wellness retreats, spa experiences, and adventure activities from hiking to water sports."
+    },
+    {
+      icon: Heart,
+      title: "Cultural & Local Experiences",
+      description: "Immerse yourself in local cultures, guided tours, and authentic community experiences."
+    },
+    {
+      icon: Utensils,
+      title: "Fine Dining & Culinary",
+      description: "Michelin-starred restaurants, cooking classes, wine tastings, and gourmet experiences."
+    },
+    {
+      icon: Music,
+      title: "Entertainment & Events",
+      description: "Concert tickets, sports events, theater shows, and VIP experiences with premium seating."
+    },
+    {
+      icon: Ticket,
+      title: "Sports & Concert Tickets",
+      description: "Premium access to major sporting events and concerts worldwide with VIP packages."
+    },
+    {
       icon: Calendar,
       title: "Custom Itineraries",
-      description: "Personalized travel planning tailored to your preferences, budget, and travel style."
+      description: "Personalized travel planning tailored to your preferences, budget, and lifestyle."
     },
     {
       icon: Users,
@@ -80,17 +144,17 @@ export default function TravelPlanning() {
     {
       number: 1,
       title: "Share Your Vision",
-      description: "Tell us your travel dreams, budget, and preferences. Our team listens and understands your needs."
+      description: "Tell us your travel dreams, preferences, and what experiences matter most to you."
     },
     {
       number: 2,
       title: "Get Expert Guidance",
-      description: "Receive personalized recommendations from our experienced travel consultants."
+      description: "Receive personalized recommendations from our experienced travel and lifestyle specialists."
     },
     {
       number: 3,
-      title: "Book with Confidence",
-      description: "We handle all the details—flights, hotels, activities, and more through trusted vendors."
+      title: "Book Everything",
+      description: "We handle flights, hotels, car rentals, activities, tickets, dining — everything in one place."
     },
     {
       number: 4,
@@ -98,6 +162,10 @@ export default function TravelPlanning() {
       description: "Embark on your adventure with 24/7 support and peace of mind throughout your journey."
     }
   ];
+
+  const filteredPackages = activeTab === 'all' 
+    ? comprehensivePackages 
+    : comprehensivePackages.filter(pkg => pkg.category === activeTab);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -110,7 +178,7 @@ export default function TravelPlanning() {
               <span className="font-bold text-secondary">Benny's Emporium</span>
             </a>
           </Link>
-          <h1 className="text-xl font-bold text-white">Travel Planning</h1>
+          <h1 className="text-xl font-bold text-white">Travel & Lifestyle</h1>
           <div className="w-20"></div>
         </div>
       </nav>
@@ -119,10 +187,10 @@ export default function TravelPlanning() {
       <header className="pt-32 pb-16 bg-gradient-to-b from-primary to-primary/80">
         <div className="container">
           <h1 className="text-5xl md:text-6xl font-bold text-white mb-6">
-            Plan Your Perfect Getaway
+            Your Complete Travel & Lifestyle Hub
           </h1>
           <p className="text-xl text-white/90 max-w-2xl mb-8">
-            Expert travel planning with personalized support through IntelliTravel's partner network. Book flights, hotels, cruises, and all-inclusive packages with ease.
+            Flights, hotels, car rentals, cruises, wellness retreats, adventure activities, fine dining, sports tickets, concert tickets, and unforgettable experiences — all curated and integrated through IntelliTravel's partner network.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
             <Button
@@ -139,16 +207,43 @@ export default function TravelPlanning() {
         </div>
       </header>
 
+      {/* Filter Tabs */}
+      <section className="py-8 bg-card border-b border-border sticky top-20 z-40">
+        <div className="container">
+          <div className="flex flex-wrap gap-3 justify-center">
+            {[
+              { value: 'all', label: 'All Packages' },
+              { value: 'flights', label: 'Flights' },
+              { value: 'hotels', label: 'Hotels' },
+              { value: 'cruises', label: 'Cruises' },
+              { value: 'experiences', label: 'Experiences' }
+            ].map(tab => (
+              <button
+                key={tab.value}
+                onClick={() => setActiveTab(tab.value as any)}
+                className={`px-6 py-2 rounded-full font-semibold transition-all duration-300 ${
+                  activeTab === tab.value
+                    ? 'bg-secondary text-primary'
+                    : 'bg-background text-foreground border border-border hover:border-secondary'
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Featured Packages */}
       <section className="py-24 bg-background">
         <div className="container">
           <h2 className="text-4xl md:text-5xl font-bold text-center text-primary mb-4">
-            Featured Travel Packages
+            Featured Packages & Experiences
           </h2>
           <div className="section-divider"></div>
 
-          <div className="grid md:grid-cols-3 gap-8 mb-12">
-            {travelPackages.map((pkg, index) => (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+            {filteredPackages.map((pkg, index) => (
               <div
                 key={pkg.id}
                 className="service-card-luxury overflow-hidden group"
@@ -192,17 +287,17 @@ export default function TravelPlanning() {
         </div>
       </section>
 
-      {/* Why Choose Us */}
+      {/* Comprehensive Services Grid */}
       <section className="py-24 bg-card">
         <div className="container">
           <h2 className="text-4xl md:text-5xl font-bold text-center text-primary mb-4">
-            Why Choose IntelliTravel?
+            Everything You Need for the Perfect Journey
           </h2>
           <div className="section-divider"></div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {features.map((feature, index) => {
-              const IconComponent = feature.icon;
+            {services.map((service, index) => {
+              const IconComponent = service.icon;
               return (
                 <div
                   key={index}
@@ -216,8 +311,8 @@ export default function TravelPlanning() {
                       <IconComponent className="w-6 h-6 text-white" />
                     </div>
                   </div>
-                  <h3 className="text-xl font-bold mb-3 text-primary">{feature.title}</h3>
-                  <p className="text-foreground/70 leading-relaxed">{feature.description}</p>
+                  <h3 className="text-xl font-bold mb-3 text-primary">{service.title}</h3>
+                  <p className="text-foreground/70 leading-relaxed">{service.description}</p>
                 </div>
               );
             })}
@@ -261,20 +356,20 @@ export default function TravelPlanning() {
             Ready to Start Your Journey?
           </h2>
           <p className="text-center text-lg text-white/90 mb-12">
-            Once our IntelliTravel portal and travel GMX email are active, you'll be able to request quotes, get guidance, and book commission-eligible trips with ease.
+            Once our IntelliTravel portal and travel GMX email are active, you'll be able to request quotes, get guidance, and book commission-eligible trips with ease. From flights and hotels to wellness retreats, concert tickets, and culinary experiences — we handle it all.
           </p>
 
           <div className="grid md:grid-cols-2 gap-6 mb-12">
             <div className="bg-white/10 border border-white/20 rounded-lg p-8 backdrop-blur-sm">
               <h3 className="text-2xl font-bold mb-4">Quick Quote</h3>
-              <p className="text-white/80 mb-6">Get instant pricing for your travel plans</p>
+              <p className="text-white/80 mb-6">Get instant pricing for your travel and lifestyle plans</p>
               <Button className="w-full bg-secondary hover:bg-secondary/90 text-primary font-bold py-3 rounded-full">
                 Request Quote
               </Button>
             </div>
             <div className="bg-white/10 border border-white/20 rounded-lg p-8 backdrop-blur-sm">
               <h3 className="text-2xl font-bold mb-4">Expert Consultation</h3>
-              <p className="text-white/80 mb-6">Speak with our travel specialists</p>
+              <p className="text-white/80 mb-6">Speak with our travel and lifestyle specialists</p>
               <Button className="w-full bg-secondary hover:bg-secondary/90 text-primary font-bold py-3 rounded-full">
                 Schedule Call
               </Button>
@@ -300,7 +395,7 @@ export default function TravelPlanning() {
       <footer className="bg-primary/80 text-white py-8">
         <div className="container text-center">
           <p className="text-white/70">
-            © 2026 Benny's Emporium Travel Planning. All rights reserved.
+            © 2026 Benny's Emporium Travel & Lifestyle. All rights reserved.
           </p>
           <Link href="/">
             <a className="text-secondary hover:text-secondary/80 transition-colors mt-4 inline-block">
