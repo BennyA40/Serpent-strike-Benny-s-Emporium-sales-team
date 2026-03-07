@@ -138,7 +138,7 @@ export default function Home() {
                   </p>
                   {activeService === service.id && (
                     <div className="mt-4 pt-4 border-t border-secondary/20">
-                      <a href="#contact" className="text-secondary font-semibold hover:text-secondary/80 transition-colors inline-flex items-center gap-2">
+                      <a href={service.id === 1 ? "/travel-planning" : "#contact"} className="text-secondary font-semibold hover:text-secondary/80 transition-colors inline-flex items-center gap-2">
                         Learn More →
                       </a>
                     </div>
