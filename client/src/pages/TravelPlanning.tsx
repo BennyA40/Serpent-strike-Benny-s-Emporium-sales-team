@@ -2,6 +2,8 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, MapPin, Plane, Hotel, Ship, Calendar, Users, DollarSign, CheckCircle2, Ticket, Utensils, Dumbbell, Music, Car, Heart } from "lucide-react";
 import { Link } from "wouter";
 import { useState } from "react";
+import TestimonialsCarousel from "@/components/TestimonialsCarousel";
+import SearchFilter from "@/components/SearchFilter";
 
 /* Design System: Modern Luxury Marketplace
    - Travel & Lifestyle Hub - Comprehensive Platform
@@ -13,6 +15,54 @@ import { useState } from "react";
 
 export default function TravelPlanning() {
   const [activeTab, setActiveTab] = useState<'all' | 'flights' | 'hotels' | 'cruises' | 'experiences'>('all');
+
+  const testimonials = [
+    {
+      id: 1,
+      name: "Sarah Mitchell",
+      location: "London, UK",
+      rating: 5,
+      quote: "The Paris package was absolutely magical. Every detail was perfectly planned.",
+      experience: "Parisian Romance Package - 5 days"
+    },
+    {
+      id: 2,
+      name: "James Chen",
+      location: "Singapore",
+      rating: 5,
+      quote: "Our Bali wellness retreat transformed our lives. Highly recommend!",
+      experience: "Wellness Retreat Paradise - 7 days"
+    },
+    {
+      id: 3,
+      name: "Emma Rodriguez",
+      location: "Madrid, Spain",
+      rating: 5,
+      quote: "The Caribbean yacht experience was the trip of a lifetime.",
+      experience: "Luxury Yacht Experience - 7 days"
+    },
+    {
+      id: 4,
+      name: "David Thompson",
+      location: "Toronto, Canada",
+      rating: 5,
+      quote: "Tokyo culinary journey exceeded all expectations. Incredible dining experiences.",
+      experience: "Culinary Journey - 7 days"
+    },
+    {
+      id: 5,
+      name: "Lisa Anderson",
+      location: "Sydney, Australia",
+      rating: 5,
+      quote: "Dubai luxury experience was world-class. Everything was seamless.",
+      experience: "Luxury Dubai Experience - 5 days"
+    }
+  ];
+
+  const handleFilter = (criteria: any) => {
+    // Filter logic can be expanded here
+    console.log("Filters applied:", criteria);
+  };
 
   const comprehensivePackages = [
     {
@@ -207,6 +257,13 @@ export default function TravelPlanning() {
         </div>
       </header>
 
+      {/* Search & Filter Section */}
+      <section className="py-12 bg-background">
+        <div className="container">
+          <SearchFilter onFilter={handleFilter} />
+        </div>
+      </section>
+
       {/* Filter Tabs */}
       <section className="py-8 bg-card border-b border-border sticky top-20 z-40">
         <div className="container">
@@ -283,6 +340,19 @@ export default function TravelPlanning() {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section className="py-24 bg-background">
+        <div className="container">
+          <h2 className="text-4xl md:text-5xl font-bold text-center text-primary mb-4">
+            What Our Travelers Say
+          </h2>
+          <div className="section-divider"></div>
+          <div className="max-w-3xl mx-auto">
+            <TestimonialsCarousel testimonials={testimonials} />
           </div>
         </div>
       </section>

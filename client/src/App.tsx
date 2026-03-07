@@ -6,12 +6,24 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
 import TravelPlanning from "./pages/TravelPlanning";
+import Paris from "./pages/destinations/Paris";
+import Bali from "./pages/destinations/Bali";
+import Tokyo from "./pages/destinations/Tokyo";
+import Caribbean from "./pages/destinations/Caribbean";
+import NewYork from "./pages/destinations/NewYork";
+import Dubai from "./pages/destinations/Dubai";
 
 function Router() {
   return (
     <Switch>
       <Route path={"/"} component={Home} />
       <Route path={"/travel-planning"} component={TravelPlanning} />
+      <Route path={"/destinations/paris"} component={Paris} />
+      <Route path={"/destinations/bali"} component={Bali} />
+      <Route path={"/destinations/tokyo"} component={Tokyo} />
+      <Route path={"/destinations/caribbean"} component={Caribbean} />
+      <Route path={"/destinations/new-york"} component={NewYork} />
+      <Route path={"/destinations/dubai"} component={Dubai} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
