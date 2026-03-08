@@ -222,11 +222,9 @@ export default function TravelPlanning() {
       {/* Navigation */}
       <nav className="fixed top-0 w-full bg-primary/95 backdrop-blur-sm z-50 shadow-sm">
         <div className="container flex items-center justify-between py-4">
-          <Link href="/">
-            <a className="flex items-center gap-2 hover:text-secondary transition-colors">
-              <ArrowLeft className="w-5 h-5" />
-              <span className="font-bold text-secondary">Benny's Emporium</span>
-            </a>
+          <Link href="/" className="flex items-center gap-2 hover:text-secondary transition-colors">
+            <ArrowLeft className="w-5 h-5" />
+            <span className="font-bold text-secondary">Benny's Emporium</span>
           </Link>
           <h1 className="text-xl font-bold text-white">Travel & Lifestyle</h1>
           <div className="w-20"></div>
@@ -467,10 +465,8 @@ export default function TravelPlanning() {
           <p className="text-white/70">
             © 2026 Benny's Emporium Travel & Lifestyle. All rights reserved.
           </p>
-          <Link href="/">
-            <a className="text-secondary hover:text-secondary/80 transition-colors mt-4 inline-block">
-              ← Back to Home
-            </a>
+          <Link href="/" className="text-secondary hover:text-secondary/80 transition-colors mt-4 inline-block">
+            ← Back to Home
           </Link>
         </div>
       </footer>
