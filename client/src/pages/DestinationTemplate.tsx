@@ -28,11 +28,9 @@ export default function DestinationTemplate({ destination }: DestinationPageProp
       {/* Navigation */}
       <nav className="fixed top-0 w-full bg-primary/95 backdrop-blur-sm z-50 shadow-sm">
         <div className="container flex items-center justify-between py-4">
-          <Link href="/travel-planning">
-            <a className="flex items-center gap-2 hover:text-secondary transition-colors">
-              <ArrowLeft className="w-5 h-5" />
-              <span className="font-bold text-secondary">Travel Hub</span>
-            </a>
+          <Link href="/travel-planning" className="flex items-center gap-2 hover:text-secondary transition-colors">
+            <ArrowLeft className="w-5 h-5" />
+            <span className="font-bold text-secondary">Travel Hub</span>
           </Link>
           <h1 className="text-xl font-bold text-white">{destination.name}</h1>
           <div className="w-20"></div>
@@ -172,10 +170,8 @@ export default function DestinationTemplate({ destination }: DestinationPageProp
           <p className="text-white/70 mb-4">
             © 2026 Benny's Emporium Travel & Lifestyle. All rights reserved.
           </p>
-          <Link href="/travel-planning">
-            <a className="text-secondary hover:text-secondary/80 transition-colors inline-block">
-              ← Back to Travel Hub
-            </a>
+          <Link href="/travel-planning" className="text-secondary hover:text-secondary/80 transition-colors inline-block">
+            ← Back to Travel Hub
           </Link>
         </div>
       </footer>
