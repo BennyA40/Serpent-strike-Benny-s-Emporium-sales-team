@@ -1,0 +1,1 @@
+ALTER TABLE `loan_partners` MODIFY COLUMN `totalEarnings` decimal(15,2) DEFAULT '0';

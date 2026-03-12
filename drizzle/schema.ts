@@ -276,3 +276,157 @@ export const freelancePayouts = mysqlTable("freelance_payouts", {
 
 export type FreelancePayout = typeof freelancePayouts.$inferSelect;
 export type InsertFreelancePayout = typeof freelancePayouts.$inferInsert;
+
+
+/**
+ * Loan Brokering Hub Tables
+ */
+
+/**
+ * Loan Applications - Main intake form
+ */
+export const loanApplications = mysqlTable("loan_applications", {
+  id: int("id").autoincrement().primaryKey(),
+  applicationId: varchar("applicationId", { length: 64 }).notNull().unique(),
+  userId: int("userId").notNull(),
+  loanType: mysqlEnum("loanType", ["mca", "term_loan", "loc", "equipment", "personal", "business"]).notNull(),
+  loanAmount: decimal("loanAmount", { precision: 15, scale: 2 }).notNull(),
+  businessName: varchar("businessName", { length: 255 }),
+  businessType: varchar("businessType", { length: 100 }),
+  monthlyRevenue: decimal("monthlyRevenue", { precision: 15, scale: 2 }),
+  yearsInBusiness: int("yearsInBusiness"),
+  creditScore: int("creditScore"),
+  purpose: text("purpose"),
+  status: mysqlEnum("status", ["pending", "qualified", "routed", "approved", "declined", "funded"]).default("pending"),
+  qualificationScore: int("qualificationScore"),
+  routedLenderId: int("routedLenderId"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type LoanApplication = typeof loanApplications.$inferSelect;
+export type InsertLoanApplication = typeof loanApplications.$inferInsert;
+
+/**
+ * Lender Network - Available lenders and their products
+ */
+export const lenders = mysqlTable("lenders", {
+  id: int("id").autoincrement().primaryKey(),
+  lenderName: varchar("lenderName", { length: 255 }).notNull(),
+  lenderType: mysqlEnum("lenderType", ["mca", "bank", "alternative", "credit_repair", "affiliate"]).notNull(),
+  apiKey: varchar("apiKey", { length: 255 }),
+  apiEndpoint: varchar("apiEndpoint", { length: 255 }),
+  minLoanAmount: decimal("minLoanAmount", { precision: 15, scale: 2 }),
+  maxLoanAmount: decimal("maxLoanAmount", { precision: 15, scale: 2 }),
+  minCreditScore: int("minCreditScore"),
+  minMonthlyRevenue: decimal("minMonthlyRevenue", { precision: 15, scale: 2 }),
+  commissionRate: decimal("commissionRate", { precision: 5, scale: 2 }).notNull(),
+  isActive: int("isActive").default(1),
+  contactEmail: varchar("contactEmail", { length: 255 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Lender = typeof lenders.$inferSelect;
+export type InsertLender = typeof lenders.$inferInsert;
+
+/**
+ * Loan Offers - Offers from lenders to borrowers
+ */
+export const loanOffers = mysqlTable("loan_offers", {
+  id: int("id").autoincrement().primaryKey(),
+  offerId: varchar("offerId", { length: 64 }).notNull().unique(),
+  applicationId: varchar("applicationId", { length: 64 }).notNull(),
+  lenderId: int("lenderId").notNull(),
+  loanAmount: decimal("loanAmount", { precision: 15, scale: 2 }).notNull(),
+  interestRate: decimal("interestRate", { precision: 5, scale: 2 }),
+  term: int("term"),
+  monthlyPayment: decimal("monthlyPayment", { precision: 15, scale: 2 }),
+  fees: decimal("fees", { precision: 15, scale: 2 }),
+  apr: decimal("apr", { precision: 5, scale: 2 }),
+  status: mysqlEnum("status", ["pending", "accepted", "rejected", "expired"]).default("pending"),
+  expiresAt: timestamp("expiresAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type LoanOffer = typeof loanOffers.$inferSelect;
+export type InsertLoanOffer = typeof loanOffers.$inferInsert;
+
+/**
+ * Loan Deals - Completed transactions
+ */
+export const loanDeals = mysqlTable("loan_deals", {
+  id: int("id").autoincrement().primaryKey(),
+  dealId: varchar("dealId", { length: 64 }).notNull().unique(),
+  applicationId: varchar("applicationId", { length: 64 }).notNull(),
+  offerId: varchar("offerId", { length: 64 }).notNull(),
+  lenderId: int("lenderId").notNull(),
+  borrowerId: int("borrowerId").notNull(),
+  loanAmount: decimal("loanAmount", { precision: 15, scale: 2 }).notNull(),
+  fundingDate: timestamp("fundingDate"),
+  status: mysqlEnum("status", ["pending", "funded", "active", "completed", "defaulted"]).default("pending"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type LoanDeal = typeof loanDeals.$inferSelect;
+export type InsertLoanDeal = typeof loanDeals.$inferInsert;
+
+/**
+ * Commission Tracking - Multi-layer commission system
+ */
+export const loanCommissions = mysqlTable("loan_commissions", {
+  id: int("id").autoincrement().primaryKey(),
+  dealId: varchar("dealId", { length: 64 }).notNull(),
+  layer: mysqlEnum("layer", ["primary_loan", "secondary_offer", "lifestyle_upsell", "referral"]).notNull(),
+  commissionAmount: decimal("commissionAmount", { precision: 15, scale: 2 }).notNull(),
+  commissionRate: decimal("commissionRate", { precision: 5, scale: 2 }).notNull(),
+  recipientId: int("recipientId").notNull(),
+  recipientType: mysqlEnum("recipientType", ["benny", "manus", "partner", "freelancer"]).notNull(),
+  status: mysqlEnum("status", ["pending", "earned", "paid"]).default("pending"),
+  paidAt: timestamp("paidAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type LoanCommission = typeof loanCommissions.$inferSelect;
+export type InsertLoanCommission = typeof loanCommissions.$inferInsert;
+
+/**
+ * Partner Network - Referral agents and partners
+ */
+export const loanPartners = mysqlTable("loan_partners", {
+  id: int("id").autoincrement().primaryKey(),
+  partnerId: varchar("partnerId", { length: 64 }).notNull().unique(),
+  userId: int("userId").notNull(),
+  partnerType: mysqlEnum("partnerType", ["agent", "freelancer", "travel_partner", "affiliate"]).notNull(),
+  businessName: varchar("businessName", { length: 255 }),
+  commissionRate: decimal("commissionRate", { precision: 5, scale: 2 }).notNull(),
+  totalReferrals: int("totalReferrals").default(0),
+  totalEarnings: decimal("totalEarnings", { precision: 15, scale: 2 }).default("0"),
+  status: mysqlEnum("status", ["active", "inactive", "suspended"]).default("active"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type LoanPartner = typeof loanPartners.$inferSelect;
+export type InsertLoanPartner = typeof loanPartners.$inferInsert;
+
+/**
+ * Partner Referrals - Track referrals from partners
+ */
+export const partnerReferrals = mysqlTable("partner_referrals", {
+  id: int("id").autoincrement().primaryKey(),
+  referralId: varchar("referralId", { length: 64 }).notNull().unique(),
+  partnerId: varchar("partnerId", { length: 64 }).notNull(),
+  applicationId: varchar("applicationId", { length: 64 }).notNull(),
+  dealId: varchar("dealId", { length: 64 }),
+  referralCommission: decimal("referralCommission", { precision: 15, scale: 2 }),
+  status: mysqlEnum("status", ["pending", "qualified", "funded", "paid"]).default("pending"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type PartnerReferral = typeof partnerReferrals.$inferSelect;
+export type InsertPartnerReferral = typeof partnerReferrals.$inferInsert;

@@ -22,6 +22,20 @@
       "when": 1773321856732,
       "tag": "0002_chunky_rick_jones",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1773344083891,
+      "tag": "0003_orange_wild_pack",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1773344202379,
+      "tag": "0004_clean_blade",
+      "breakpoints": true
     }
   ]
 }

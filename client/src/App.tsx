@@ -8,6 +8,7 @@ import Home from "./pages/Home";
 import TravelPlanning from "./pages/TravelPlanning";
 import BookingsDashboard from "./pages/BookingsDashboard";
 import FreelanceHub from "./pages/FreelanceHub";
+import LoanHub from "./pages/LoanHub";
 import Paris from "./pages/destinations/Paris";
 import Bali from "./pages/destinations/Bali";
 import Tokyo from "./pages/destinations/Tokyo";
@@ -22,6 +23,7 @@ function Router() {
       <Route path={"/travel-planning"} component={TravelPlanning} />
       <Route path={"/bookings"} component={BookingsDashboard} />
       <Route path={"/freelance"} component={FreelanceHub} />
+      <Route path={"/loans"} component={LoanHub} />
       <Route path={"/destinations/paris"} component={Paris} />
       <Route path={"/destinations/bali"} component={Bali} />
       <Route path={"/destinations/tokyo"} component={Tokyo} />
