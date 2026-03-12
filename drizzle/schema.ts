@@ -142,3 +142,137 @@ export const bookingQuotes = mysqlTable("booking_quotes", {
 
 export type BookingQuote = typeof bookingQuotes.$inferSelect;
 export type InsertBookingQuote = typeof bookingQuotes.$inferInsert;
+/**
+ * Freelancer Profiles Table
+ * Stores freelancer information, skills, and rates
+ */
+export const freelancerProfiles = mysqlTable("freelancer_profiles", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull().unique(),
+  title: varchar("title", { length: 200 }).notNull(),
+  bio: text("bio"),
+  profileImage: varchar("profileImage", { length: 500 }),
+  hourlyRate: decimal("hourlyRate", { precision: 10, scale: 2 }).notNull(),
+  skills: json("skills"), // Array of skill strings
+  categories: json("categories"), // Array of category strings
+  portfolio: json("portfolio"), // Array of portfolio items
+  totalEarnings: decimal("totalEarnings", { precision: 12, scale: 2 }).default("0"),
+  totalProjects: int("totalProjects").default(0),
+  averageRating: decimal("averageRating", { precision: 3, scale: 2 }).default("5"),
+  totalReviews: int("totalReviews").default(0),
+  isVerified: int("isVerified").default(0),
+  availability: mysqlEnum("availability", ["available", "busy", "unavailable"]).default("available"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type FreelancerProfile = typeof freelancerProfiles.$inferSelect;
+export type InsertFreelancerProfile = typeof freelancerProfiles.$inferInsert;
+
+/**
+ * Freelance Services Table
+ * Individual service listings created by freelancers
+ */
+export const freelanceServices = mysqlTable("freelance_services", {
+  id: int("id").autoincrement().primaryKey(),
+  freelancerId: int("freelancerId").notNull(),
+  title: varchar("title", { length: 300 }).notNull(),
+  description: text("description").notNull(),
+  category: varchar("category", { length: 100 }).notNull(),
+  price: decimal("price", { precision: 10, scale: 2 }).notNull(),
+  deliveryDays: int("deliveryDays").notNull(),
+  serviceImage: varchar("serviceImage", { length: 500 }),
+  highlights: json("highlights"), // Array of key highlights
+  totalOrders: int("totalOrders").default(0),
+  averageRating: decimal("averageRating", { precision: 3, scale: 2 }).default("5"),
+  totalReviews: int("totalReviews").default(0),
+  isActive: int("isActive").default(1),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type FreelanceService = typeof freelanceServices.$inferSelect;
+export type InsertFreelanceService = typeof freelanceServices.$inferInsert;
+
+/**
+ * Freelance Projects/Gigs Table
+ * Bookings/projects created when clients hire freelancers
+ */
+export const freelanceProjects = mysqlTable("freelance_projects", {
+  id: int("id").autoincrement().primaryKey(),
+  projectId: varchar("projectId", { length: 64 }).notNull().unique(),
+  clientId: int("clientId").notNull(),
+  freelancerId: int("freelancerId").notNull(),
+  serviceId: int("serviceId"),
+  title: varchar("title", { length: 300 }).notNull(),
+  description: text("description"),
+  category: varchar("category", { length: 100 }).notNull(),
+  projectPrice: decimal("projectPrice", { precision: 10, scale: 2 }).notNull(),
+  platformFee: decimal("platformFee", { precision: 10, scale: 2 }).notNull(), // 30% of price
+  freelancerPayout: decimal("freelancerPayout", { precision: 10, scale: 2 }).notNull(), // 70% of price
+  manusFeature: decimal("manusFeature", { precision: 10, scale: 2 }).notNull(), // 15% of price
+  bennysProfit: decimal("bennysProfit", { precision: 10, scale: 2 }).notNull(), // 15% of price
+  deliveryDeadline: timestamp("deliveryDeadline").notNull(),
+  status: mysqlEnum("status", ["pending", "active", "completed", "cancelled", "disputed"]).default("pending"),
+  paymentStatus: mysqlEnum("paymentStatus", ["pending", "paid", "refunded"]).default("pending"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type FreelanceProject = typeof freelanceProjects.$inferSelect;
+export type InsertFreelanceProject = typeof freelanceProjects.$inferInsert;
+
+/**
+ * Freelance Messages Table
+ * Communication between clients and freelancers
+ */
+export const freelanceMessages = mysqlTable("freelance_messages", {
+  id: int("id").autoincrement().primaryKey(),
+  projectId: int("projectId").notNull(),
+  senderId: int("senderId").notNull(),
+  recipientId: int("recipientId").notNull(),
+  message: text("message").notNull(),
+  attachments: json("attachments"), // Array of file URLs
+  isRead: int("isRead").default(0),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type FreelanceMessage = typeof freelanceMessages.$inferSelect;
+export type InsertFreelanceMessage = typeof freelanceMessages.$inferInsert;
+
+/**
+ * Freelance Reviews Table
+ * Client reviews for completed projects
+ */
+export const freelanceReviews = mysqlTable("freelance_reviews", {
+  id: int("id").autoincrement().primaryKey(),
+  projectId: int("projectId").notNull(),
+  clientId: int("clientId").notNull(),
+  freelancerId: int("freelancerId").notNull(),
+  rating: int("rating").notNull(), // 1-5 stars
+  review: text("review"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type FreelanceReview = typeof freelanceReviews.$inferSelect;
+export type InsertFreelanceReview = typeof freelanceReviews.$inferInsert;
+
+/**
+ * Freelance Payouts Table
+ * Track payments to freelancers
+ */
+export const freelancePayouts = mysqlTable("freelance_payouts", {
+  id: int("id").autoincrement().primaryKey(),
+  freelancerId: int("freelancerId").notNull(),
+  projectId: int("projectId"),
+  payoutAmount: decimal("payoutAmount", { precision: 10, scale: 2 }).notNull(),
+  payoutStatus: mysqlEnum("payoutStatus", ["pending", "processing", "completed", "failed"]).default("pending"),
+  paymentMethod: varchar("paymentMethod", { length: 100 }),
+  stripePayoutId: varchar("stripePayoutId", { length: 100 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  completedAt: timestamp("completedAt"),
+});
+
+export type FreelancePayout = typeof freelancePayouts.$inferSelect;
+export type InsertFreelancePayout = typeof freelancePayouts.$inferInsert;

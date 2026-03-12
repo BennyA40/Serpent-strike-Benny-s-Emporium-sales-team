@@ -15,6 +15,13 @@
       "when": 1772861873718,
       "tag": "0001_cynical_roxanne_simpson",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1773321856732,
+      "tag": "0002_chunky_rick_jones",
+      "breakpoints": true
     }
   ]
 }
