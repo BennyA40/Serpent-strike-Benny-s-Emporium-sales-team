@@ -203,7 +203,7 @@ export default function Home() {
               <div className="flex flex-col md:flex-row items-center justify-center gap-6 text-foreground/70">
                 <div className="flex items-center gap-2">
                   <Mail className="w-5 h-5 text-secondary" />
-                  <span>benny@bennysemporium.com</span>
+                  <span>ligersama777@gmail.com</span>
                 </div>
                 <div className="hidden md:block w-px h-6 bg-border"></div>
                 <div className="flex items-center gap-2">
@@ -213,7 +213,7 @@ export default function Home() {
                 <div className="hidden md:block w-px h-6 bg-border"></div>
                 <div className="flex items-center gap-2">
                   <Phone className="w-5 h-5 text-secondary" />
-                  <span>+1 (555) 123-4567</span>
+                  <span>484-201-7626</span>
                 </div>
               </div>
             </div>
