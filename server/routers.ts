@@ -1,10 +1,12 @@
-import { COOKIE_NAME } from "@shared/const";
+import { COOKIE_NAME } from "../shared/const";
+import { z } from "zod";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router } from "./_core/trpc";
 import { bookingsRouter } from "./routers/bookings";
 import { freelanceRouter } from "./routers/freelance";
 import { loansRouter } from "./routers/loans";
+import { battalionRouter } from "./routers/battalion";
 
 export const appRouter = router({
     // if you need to use socket.io, read and register route in server/_core/index.ts, all api should start with '/api/' so that the gateway can route correctly
@@ -23,6 +25,7 @@ export const appRouter = router({
   bookings: bookingsRouter,
   freelance: freelanceRouter,
   loans: loansRouter,
+  battalion: battalionRouter,
 });
 
 export type AppRouter = typeof appRouter;

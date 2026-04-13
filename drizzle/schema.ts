@@ -430,3 +430,132 @@ export const partnerReferrals = mysqlTable("partner_referrals", {
 
 export type PartnerReferral = typeof partnerReferrals.$inferSelect;
 export type InsertPartnerReferral = typeof partnerReferrals.$inferInsert;
+
+/**
+ * SERPENT STRIKE BATTALION INTEGRATION
+ * Command structure, agent management, and commission tracking
+ */
+
+/**
+ * Battalion Squads - 5 specialized squads under Shelby's command
+ */
+export const battalionSquads = mysqlTable("battalion_squads", {
+  id: int("id").autoincrement().primaryKey(),
+  squadId: varchar("squadId", { length: 64 }).notNull().unique(),
+  squadName: varchar("squadName", { length: 100 }).notNull(), // Alpha Strike, Bravo Conversion, etc.
+  commanderId: int("commanderId").notNull(), // User ID of squad commander
+  focus: mysqlEnum("focus", ["travel", "freelance", "loans", "operations", "creative"]).notNull(),
+  description: text("description"),
+  agentCount: int("agentCount").default(0),
+  totalRevenue: decimal("totalRevenue", { precision: 15, scale: 2 }).default("0"),
+  totalCommissions: decimal("totalCommissions", { precision: 15, scale: 2 }).default("0"),
+  status: mysqlEnum("status", ["active", "inactive"]).default("active"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type BattalionSquad = typeof battalionSquads.$inferSelect;
+export type InsertBattalionSquad = typeof battalionSquads.$inferInsert;
+
+/**
+ * Battalion Agents - 30 agents across 5 squads
+ */
+export const battalionAgents = mysqlTable("battalion_agents", {
+  id: int("id").autoincrement().primaryKey(),
+  agentId: varchar("agentId", { length: 64 }).notNull().unique(),
+  userId: int("userId").notNull().unique(),
+  squadId: int("squadId").notNull(), // Foreign key to battalionSquads
+  rank: mysqlEnum("rank", ["commander", "xo", "sergeant", "specialist", "recruit"]).default("specialist"),
+  firstName: varchar("firstName", { length: 100 }).notNull(),
+  lastName: varchar("lastName", { length: 100 }).notNull(),
+  email: varchar("email", { length: 320 }).notNull(),
+  phone: varchar("phone", { length: 20 }),
+  profileImage: varchar("profileImage", { length: 500 }),
+  specialization: mysqlEnum("specialization", ["travel", "freelance", "loans", "operations", "creative"]).notNull(),
+  totalBookings: int("totalBookings").default(0),
+  totalProjects: int("totalProjects").default(0),
+  totalDeals: int("totalDeals").default(0),
+  totalRevenue: decimal("totalRevenue", { precision: 15, scale: 2 }).default("0"),
+  totalCommissions: decimal("totalCommissions", { precision: 15, scale: 2 }).default("0"),
+  commissionRate: decimal("commissionRate", { precision: 5, scale: 2 }).default("5"), // Base rate %
+  performanceScore: int("performanceScore").default(0), // 0-100
+  status: mysqlEnum("status", ["active", "inactive", "suspended"]).default("active"),
+  joinedAt: timestamp("joinedAt").defaultNow().notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type BattalionAgent = typeof battalionAgents.$inferSelect;
+export type InsertBattalionAgent = typeof battalionAgents.$inferInsert;
+
+/**
+ * Agent Assignments - Link agents to bookings/projects/deals
+ */
+export const agentAssignments = mysqlTable("agent_assignments", {
+  id: int("id").autoincrement().primaryKey(),
+  assignmentId: varchar("assignmentId", { length: 64 }).notNull().unique(),
+  agentId: int("agentId").notNull(), // Foreign key to battalionAgents
+  assignmentType: mysqlEnum("assignmentType", ["flight", "carRental", "cruise", "freelanceProject", "loanDeal"]).notNull(),
+  referenceId: int("referenceId").notNull(), // ID of the booking/project/deal
+  referenceName: varchar("referenceName", { length: 255 }),
+  clientName: varchar("clientName", { length: 200 }),
+  transactionAmount: decimal("transactionAmount", { precision: 15, scale: 2 }).notNull(),
+  commissionRate: decimal("commissionRate", { precision: 5, scale: 2 }).notNull(),
+  commissionAmount: decimal("commissionAmount", { precision: 15, scale: 2 }).notNull(),
+  status: mysqlEnum("status", ["pending", "active", "completed", "cancelled"]).default("pending"),
+  completedAt: timestamp("completedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type AgentAssignment = typeof agentAssignments.$inferSelect;
+export type InsertAgentAssignment = typeof agentAssignments.$inferInsert;
+
+/**
+ * Agent Commissions - Track all commissions earned by agents
+ */
+export const agentCommissions = mysqlTable("agent_commissions", {
+  id: int("id").autoincrement().primaryKey(),
+  commissionId: varchar("commissionId", { length: 64 }).notNull().unique(),
+  agentId: int("agentId").notNull(), // Foreign key to battalionAgents
+  assignmentId: int("assignmentId"), // Foreign key to agentAssignments
+  pillar: mysqlEnum("pillar", ["travel", "freelance", "loans"]).notNull(),
+  transactionType: mysqlEnum("transactionType", ["flight", "carRental", "cruise", "freelanceProject", "loanDeal"]).notNull(),
+  transactionAmount: decimal("transactionAmount", { precision: 15, scale: 2 }).notNull(),
+  commissionRate: decimal("commissionRate", { precision: 5, scale: 2 }).notNull(),
+  commissionAmount: decimal("commissionAmount", { precision: 15, scale: 2 }).notNull(),
+  status: mysqlEnum("status", ["pending", "earned", "paid", "disputed"]).default("pending"),
+  paidAt: timestamp("paidAt"),
+  paymentMethod: varchar("paymentMethod", { length: 100 }),
+  stripePayoutId: varchar("stripePayoutId", { length: 100 }),
+  notes: text("notes"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type AgentCommission = typeof agentCommissions.$inferSelect;
+export type InsertAgentCommission = typeof agentCommissions.$inferInsert;
+
+/**
+ * Battalion Performance Metrics - Real-time KPIs
+ */
+export const battalionMetrics = mysqlTable("battalion_metrics", {
+  id: int("id").autoincrement().primaryKey(),
+  metricId: varchar("metricId", { length: 64 }).notNull().unique(),
+  agentId: int("agentId"), // NULL for squad-level metrics
+  squadId: int("squadId"), // NULL for agent-level metrics
+  period: mysqlEnum("period", ["daily", "weekly", "monthly", "quarterly", "yearly"]).notNull(),
+  periodStart: timestamp("periodStart").notNull(),
+  periodEnd: timestamp("periodEnd").notNull(),
+  totalTransactions: int("totalTransactions").default(0),
+  totalRevenue: decimal("totalRevenue", { precision: 15, scale: 2 }).default("0"),
+  totalCommissions: decimal("totalCommissions", { precision: 15, scale: 2 }).default("0"),
+  averageTransactionValue: decimal("averageTransactionValue", { precision: 15, scale: 2 }).default("0"),
+  conversionRate: decimal("conversionRate", { precision: 5, scale: 2 }).default("0"),
+  performanceRank: int("performanceRank"), // Ranking among peers
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type BattalionMetric = typeof battalionMetrics.$inferSelect;
+export type InsertBattalionMetric = typeof battalionMetrics.$inferInsert;
