@@ -5,9 +5,10 @@ import { Input } from "@/components/ui/input";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Star, Search, Filter, MapPin, Clock, DollarSign, MessageSquare } from "lucide-react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 
 export default function FreelanceHub() {
+  const [, navigate] = useLocation();
   const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | undefined>();
@@ -95,6 +96,13 @@ export default function FreelanceHub() {
                 </Button>
               </>
             )}
+            <Button
+              onClick={() => navigate("/packages")}
+              variant="outline"
+              className="px-6 ml-auto"
+            >
+              Browse Packages
+            </Button>
           </div>
         </div>
       </section>

@@ -249,6 +249,7 @@ export default function TravelPlanning() {
               Request a Quote
             </Button>
             <Button
+              onClick={() => navigate("/packages")}
               className="btn-luxury bg-white/20 hover:bg-white/30 text-white font-bold py-3 px-8 rounded-full text-lg border border-white/40"
             >
               Browse Packages
