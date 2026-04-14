@@ -6,6 +6,7 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { Star, Search, Filter, MapPin, Clock, DollarSign, MessageSquare, Award, Briefcase } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useState } from "react";
+import { ContactModal } from "@/components/ContactModal";
 
 // Subcategory data
 const subcategories = [
@@ -174,6 +175,8 @@ export default function FreelanceHub() {
   const [selectedSubcategory, setSelectedSubcategory] = useState<string | undefined>();
   const [selectedCategory, setSelectedCategory] = useState<string | undefined>();
   const [viewMode, setViewMode] = useState<"browse" | "myServices" | "myProjects">("browse");
+  const [contactModalOpen, setContactModalOpen] = useState(false);
+  const [selectedFreelancer, setSelectedFreelancer] = useState<{ id: string; name: string } | null>(null);
 
   const categories = Array.from(new Set(subcategories.map(s => s.category)));
 
@@ -377,7 +380,13 @@ export default function FreelanceHub() {
                         <p className="text-xs text-muted-foreground">Starting at</p>
                         <p className="text-2xl font-bold text-primary">${freelancer.price}</p>
                       </div>
-                      <Button className="bg-secondary hover:bg-secondary/90 text-primary gap-2">
+                      <Button
+                        onClick={() => {
+                          setSelectedFreelancer({ id: freelancer.id, name: freelancer.name });
+                          setContactModalOpen(true);
+                        }}
+                        className="bg-secondary hover:bg-secondary/90 text-primary gap-2"
+                      >
                         <MessageSquare className="w-4 h-4" />
                         Hire
                       </Button>
@@ -416,6 +425,19 @@ export default function FreelanceHub() {
             </div>
           </div>
         </section>
+      )}
+
+      {/* Contact Modal */}
+      {selectedFreelancer && (
+        <ContactModal
+          isOpen={contactModalOpen}
+          onClose={() => {
+            setContactModalOpen(false);
+            setSelectedFreelancer(null);
+          }}
+          freelancerName={selectedFreelancer.name}
+          freelancerId={selectedFreelancer.id}
+        />
       )}
     </div>
   );
