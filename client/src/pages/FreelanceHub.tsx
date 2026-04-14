@@ -1,76 +1,207 @@
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { trpc } from "@/lib/trpc";
+import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/_core/hooks/useAuth";
-import { Star, Search, Filter, MapPin, Clock, DollarSign, MessageSquare } from "lucide-react";
+import { Star, Search, Filter, MapPin, Clock, DollarSign, MessageSquare, Award, Briefcase } from "lucide-react";
 import { Link, useLocation } from "wouter";
+import { useState } from "react";
+
+// Subcategory data
+const subcategories = [
+  // Writing
+  { id: "writing-auctioneer", name: "Writer–Auctioneer", category: "Writing", icon: "🎤" },
+  { id: "writing-ritual", name: "Ritual Copywriter", category: "Writing", icon: "✨" },
+  { id: "writing-microstory", name: "Micro‑Story Artisan", category: "Writing", icon: "📖" },
+  { id: "writing-conversion", name: "Conversion Bard", category: "Writing", icon: "🎯" },
+  { id: "writing-persona", name: "Persona Architect", category: "Writing", icon: "🎭" },
+  { id: "writing-technical", name: "Technical Summarist", category: "Writing", icon: "📋" },
+  { id: "writing-ghostwriter", name: "Ghostwriter for Founders", category: "Writing", icon: "👻" },
+  { id: "writing-emotional", name: "Emotional Logic Writer", category: "Writing", icon: "💭" },
+  { id: "writing-worldbuilding", name: "Worldbuilding Scribe", category: "Writing", icon: "🌍" },
+  { id: "writing-dialogue", name: "Dialogue Tailor", category: "Writing", icon: "💬" },
+  { id: "writing-brand-scripture", name: "Brand Scripture Writer", category: "Writing", icon: "📜" },
+
+  // Web Design
+  { id: "webdesign-ux", name: "UX Ritualist", category: "Web Design", icon: "🎨" },
+  { id: "webdesign-microinteraction", name: "Micro‑Interaction Designer", category: "Web Design", icon: "✨" },
+  { id: "webdesign-conversion", name: "Conversion Layout Engineer", category: "Web Design", icon: "🎯" },
+  { id: "webdesign-brand", name: "Brand‑First Web Stylist", category: "Web Design", icon: "🎭" },
+  { id: "webdesign-nocode", name: "No‑Code / Webflow Specialist", category: "Web Design", icon: "⚡" },
+  { id: "webdesign-accessibility", name: "Accessibility‑Focused Designer", category: "Web Design", icon: "♿" },
+
+  // Video Editing
+  { id: "video-cinematic", name: "Cinematic Story Cutter", category: "Video Editing", icon: "🎬" },
+  { id: "video-social", name: "Social Pulse Editor", category: "Video Editing", icon: "📱" },
+  { id: "video-motion", name: "Motion Graphics Alchemist", category: "Video Editing", icon: "🎨" },
+  { id: "video-documentary", name: "Documentary Narrative Editor", category: "Video Editing", icon: "🎥" },
+  { id: "video-musicsynced", name: "Music‑Synced Visual Cutter", category: "Video Editing", icon: "🎵" },
+  { id: "video-colorgrading", name: "Color Grading Specialist", category: "Video Editing", icon: "🌈" },
+
+  // Consulting
+  { id: "consulting-systems", name: "Systems & Workflow Architect", category: "Consulting", icon: "⚙️" },
+  { id: "consulting-brand", name: "Brand Identity Strategist", category: "Consulting", icon: "🎯" },
+  { id: "consulting-business", name: "Business Clarity Consultant", category: "Consulting", icon: "🧭" },
+  { id: "consulting-digital", name: "Digital Transformation Advisor", category: "Consulting", icon: "🚀" },
+  { id: "consulting-market", name: "Market Positioning Analyst", category: "Consulting", icon: "📊" },
+
+  // Programming
+  { id: "programming-fullstack", name: "Full‑Stack Problem Solver", category: "Programming", icon: "💻" },
+  { id: "programming-api", name: "API Integration Specialist", category: "Programming", icon: "🔗" },
+  { id: "programming-nocode", name: "No‑Code / Low‑Code Engineer", category: "Programming", icon: "⚡" },
+  { id: "programming-performance", name: "Performance & Optimization Developer", category: "Programming", icon: "⚡" },
+  { id: "programming-security", name: "Security & Compliance Coder", category: "Programming", icon: "🔒" },
+
+  // Marketing
+  { id: "marketing-funnel", name: "Funnel & Conversion Strategist", category: "Marketing", icon: "🎯" },
+  { id: "marketing-social", name: "Social Presence Architect", category: "Marketing", icon: "📱" },
+  { id: "marketing-ads", name: "Paid Ads Technician", category: "Marketing", icon: "📢" },
+  { id: "marketing-community", name: "Community Growth Engineer", category: "Marketing", icon: "👥" },
+  { id: "marketing-analytics", name: "Analytics & Insights Specialist", category: "Marketing", icon: "📊" },
+
+  // Music
+  { id: "music-genre", name: "Genre‑Fusion Composer", category: "Music", icon: "🎵" },
+  { id: "music-vocal", name: "Vocal Production Specialist", category: "Music", icon: "🎤" },
+  { id: "music-beat", name: "Beat Architect", category: "Music", icon: "🎹" },
+  { id: "music-mixing", name: "Mixing & Mastering Engineer", category: "Music", icon: "🎚️" },
+  { id: "music-sound", name: "Sound Identity Designer", category: "Music", icon: "🔊" }
+];
+
+// Sample freelancers
+const freelancers = [
+  {
+    id: "freelancer-1",
+    name: "Alexandra Chen",
+    subcategory: "writing-conversion",
+    rating: 4.9,
+    reviews: 247,
+    price: 1500,
+    description: "Conversion copywriter specializing in SaaS and e-commerce. 8+ years experience.",
+    portfolio: ["Stripe Case Study", "Shopify Landing Page", "HubSpot Email Campaign"],
+    responseTime: "< 2 hours",
+    completedProjects: 312
+  },
+  {
+    id: "freelancer-2",
+    name: "Marcus Rodriguez",
+    subcategory: "webdesign-ux",
+    rating: 4.8,
+    reviews: 189,
+    price: 2500,
+    description: "UX designer focused on user research and intuitive flows.",
+    portfolio: ["Figma Design System", "Mobile App Redesign", "E-commerce Platform"],
+    responseTime: "< 4 hours",
+    completedProjects: 156
+  },
+  {
+    id: "freelancer-3",
+    name: "Priya Patel",
+    subcategory: "video-cinematic",
+    rating: 4.95,
+    reviews: 203,
+    price: 3000,
+    description: "Cinematic video editor for brands and creators. Emmy-nominated.",
+    portfolio: ["Brand Documentary", "Product Launch Video", "Testimonial Series"],
+    responseTime: "< 6 hours",
+    completedProjects: 89
+  },
+  {
+    id: "freelancer-4",
+    name: "James Wilson",
+    subcategory: "programming-fullstack",
+    rating: 4.85,
+    reviews: 267,
+    price: 3500,
+    description: "Full-stack developer specializing in React and Node.js.",
+    portfolio: ["SaaS Dashboard", "Real-time Chat App", "E-commerce Platform"],
+    responseTime: "< 1 hour",
+    completedProjects: 234
+  },
+  {
+    id: "freelancer-5",
+    name: "Sofia Bergström",
+    subcategory: "consulting-brand",
+    rating: 4.9,
+    reviews: 156,
+    price: 2000,
+    description: "Brand strategist helping startups find their voice.",
+    portfolio: ["Tech Startup Rebrand", "Luxury Brand Identity", "Non-profit Positioning"],
+    responseTime: "< 8 hours",
+    completedProjects: 127
+  },
+  {
+    id: "freelancer-6",
+    name: "David Kim",
+    subcategory: "marketing-funnel",
+    rating: 4.8,
+    reviews: 198,
+    price: 2200,
+    description: "Growth marketer focused on conversion optimization.",
+    portfolio: ["SaaS Growth Strategy", "E-commerce Funnel Audit", "Webinar Campaign"],
+    responseTime: "< 3 hours",
+    completedProjects: 189
+  },
+  {
+    id: "freelancer-7",
+    name: "Emma Thompson",
+    subcategory: "writing-worldbuilding",
+    rating: 4.92,
+    reviews: 134,
+    price: 2500,
+    description: "Worldbuilding expert for games and fiction.",
+    portfolio: ["Fantasy World Bible", "Game Narrative Design", "Transmedia Storytelling"],
+    responseTime: "< 12 hours",
+    completedProjects: 67
+  },
+  {
+    id: "freelancer-8",
+    name: "Raj Patel",
+    subcategory: "music-mixing",
+    rating: 4.87,
+    reviews: 178,
+    price: 1800,
+    description: "Mixing and mastering engineer. Grammy-nominated.",
+    portfolio: ["Indie Album Mastering", "Podcast Audio Design", "Commercial Jingle"],
+    responseTime: "< 24 hours",
+    completedProjects: 245
+  }
+];
 
 export default function FreelanceHub() {
   const [, navigate] = useLocation();
   const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedSubcategory, setSelectedSubcategory] = useState<string | undefined>();
   const [selectedCategory, setSelectedCategory] = useState<string | undefined>();
   const [viewMode, setViewMode] = useState<"browse" | "myServices" | "myProjects">("browse");
 
-  const { data: services } = trpc.freelance.listServices.useQuery({
-    category: selectedCategory,
+  const categories = Array.from(new Set(subcategories.map(s => s.category)));
+
+  const filteredSubcategories = selectedCategory
+    ? subcategories.filter(s => s.category === selectedCategory)
+    : subcategories;
+
+  const filteredFreelancers = freelancers.filter(f => {
+    const matchesSearch = f.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      f.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSubcategory = !selectedSubcategory || f.subcategory === selectedSubcategory;
+    return matchesSearch && matchesSubcategory;
   });
-
-  const { data: myServices } = trpc.freelance.getMyServices.useQuery(undefined, {
-    enabled: viewMode === "myServices" && !!user,
-  });
-
-  const { data: myProjects } = trpc.freelance.getMyProjects.useQuery(undefined, {
-    enabled: viewMode === "myProjects" && !!user,
-  });
-
-  const categories = [
-    "Web Design",
-    "Writing",
-    "Graphic Design",
-    "Video Editing",
-    "Consulting",
-    "Programming",
-    "Marketing",
-    "Music",
-  ];
-
-  const filteredServices = services?.filter((service) =>
-    service.title.toLowerCase().includes(searchTerm.toLowerCase())
-  ) || [];
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      {/* Navigation */}
-      <nav className="fixed top-0 w-full bg-primary/95 backdrop-blur-sm z-50 shadow-sm">
-        <div className="container flex items-center justify-between py-4">
-          <Link href="/" className="flex items-center gap-2 hover:text-secondary transition-colors">
-            <span className="font-bold text-secondary text-lg">Benny's Emporium</span>
-          </Link>
-          <h1 className="text-xl font-bold text-white">Freelance Solutions</h1>
-          <div className="w-20"></div>
-        </div>
-      </nav>
-
-      {/* Hero Section */}
-      <header className="pt-32 pb-16 bg-gradient-to-r from-primary to-primary/80">
-        <div className="container">
-          <h1 className="text-5xl md:text-6xl font-bold text-white mb-4">
-            Hire Top Talent
-          </h1>
-          <p className="text-xl text-white/90 mb-8 max-w-2xl">
-            Connect with skilled freelancers for web design, writing, consulting, and more.
-            Get your projects done by experts.
-          </p>
+      {/* Header */}
+      <header className="bg-gradient-to-r from-primary/20 to-secondary/20 border-b border-border py-12 px-4">
+        <div className="container max-w-6xl mx-auto">
+          <h1 className="text-5xl font-bold mb-2">Freelance Solutions</h1>
+          <p className="text-xl text-muted-foreground">Get your projects done by experts.</p>
         </div>
       </header>
 
-      {/* View Mode Tabs */}
-      <section className="py-8 bg-background border-b border-border">
-        <div className="container">
-          <div className="flex gap-4">
+      {/* Navigation */}
+      <nav className="sticky top-0 bg-background border-b border-border z-40">
+        <div className="container max-w-6xl mx-auto px-4 py-4">
+          <div className="flex gap-4 flex-wrap">
             <Button
               variant={viewMode === "browse" ? "default" : "outline"}
               onClick={() => setViewMode("browse")}
@@ -105,19 +236,20 @@ export default function FreelanceHub() {
             </Button>
           </div>
         </div>
-      </section>
+      </nav>
 
-      {/* Browse Services */}
+      {/* Browse Mode */}
       {viewMode === "browse" && (
-        <section className="py-16 bg-background">
-          <div className="container">
-            {/* Search and Filter */}
-            <div className="mb-12">
+        <section className="py-12 bg-background">
+          <div className="container max-w-6xl mx-auto px-4">
+            {/* Search */}
+            <div className="mb-8">
               <div className="flex gap-4 mb-6">
                 <div className="flex-1 relative">
-                  <Search className="absolute left-3 top-3 w-5 h-5 text-foreground/50" />
+                  <Search className="absolute left-3 top-3 w-5 h-5 text-muted-foreground" />
                   <Input
-                    placeholder="Search services..."
+                    type="text"
+                    placeholder="Search freelancers..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="pl-10"
@@ -130,113 +262,124 @@ export default function FreelanceHub() {
               </div>
 
               {/* Category Filter */}
-              <div className="flex flex-wrap gap-2">
-                <Button
-                  variant={selectedCategory === undefined ? "default" : "outline"}
-                  onClick={() => setSelectedCategory(undefined)}
-                  size="sm"
-                >
-                  All Categories
-                </Button>
-                {categories.map((cat) => (
+              <div className="mb-6">
+                <p className="text-sm font-medium mb-3">Categories</p>
+                <div className="flex flex-wrap gap-2">
                   <Button
-                    key={cat}
-                    variant={selectedCategory === cat ? "default" : "outline"}
-                    onClick={() => setSelectedCategory(cat)}
+                    variant={!selectedCategory ? "default" : "outline"}
+                    onClick={() => { setSelectedCategory(undefined); setSelectedSubcategory(undefined); }}
                     size="sm"
                   >
-                    {cat}
+                    All Categories
                   </Button>
-                ))}
-              </div>
-            </div>
-
-            {/* Services Grid */}
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredServices.map((service) => (
-                <Card key={service.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-                  {service.serviceImage && (
-                    <img
-                      src={service.serviceImage}
-                      alt={service.title}
-                      className="w-full h-48 object-cover"
-                    />
-                  )}
-                  <div className="p-6">
-                    <h3 className="text-xl font-bold mb-2">{service.title}</h3>
-                    <p className="text-foreground/70 text-sm mb-4 line-clamp-2">
-                      {service.description}
-                    </p>
-
-                    {/* Rating */}
-                    <div className="flex items-center gap-2 mb-4">
-                      <div className="flex items-center gap-1">
-                        {[...Array(5)].map((_, i) => (
-                          <Star
-                            key={i}
-                            className={`w-4 h-4 ${
-                              i < Math.round(Number(service.averageRating))
-                                ? "fill-secondary text-secondary"
-                                : "text-foreground/30"
-                            }`}
-                          />
-                        ))}
-                      </div>
-                      <span className="text-sm text-foreground/70">
-                        ({service.totalReviews} reviews)
-                      </span>
-                    </div>
-
-                    {/* Details */}
-                    <div className="space-y-2 mb-6 text-sm text-foreground/70">
-                      <div className="flex items-center gap-2">
-                        <Clock className="w-4 h-4" />
-                        {service.deliveryDays} days delivery
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <DollarSign className="w-4 h-4" />
-                        From ${service.price}
-                      </div>
-                    </div>
-
-                    <Button className="w-full bg-secondary hover:bg-secondary/90 text-primary">
-                      Hire Now
+                  {categories.map(cat => (
+                    <Button
+                      key={cat}
+                      variant={selectedCategory === cat ? "default" : "outline"}
+                      onClick={() => { setSelectedCategory(cat); setSelectedSubcategory(undefined); }}
+                      size="sm"
+                    >
+                      {cat}
                     </Button>
-                  </div>
-                </Card>
-              ))}
-            </div>
-
-            {filteredServices.length === 0 && (
-              <div className="text-center py-12">
-                <p className="text-foreground/70 text-lg">No services found. Try adjusting your filters.</p>
+                  ))}
+                </div>
               </div>
-            )}
-          </div>
-        </section>
-      )}
 
-      {/* My Services */}
-      {viewMode === "myServices" && (
-        <section className="py-16 bg-background">
-          <div className="container">
-            <div className="flex justify-between items-center mb-8">
-              <h2 className="text-3xl font-bold">My Services</h2>
-              <Button className="bg-secondary hover:bg-secondary/90 text-primary">
-                Create Service
-              </Button>
+              {/* Subcategory Filter */}
+              {selectedCategory && (
+                <div>
+                  <p className="text-sm font-medium mb-3">Specializations</p>
+                  <div className="flex flex-wrap gap-2">
+                    <Button
+                      variant={!selectedSubcategory ? "default" : "outline"}
+                      onClick={() => setSelectedSubcategory(undefined)}
+                      size="sm"
+                    >
+                      All {selectedCategory}
+                    </Button>
+                    {filteredSubcategories.map(sub => (
+                      <Button
+                        key={sub.id}
+                        variant={selectedSubcategory === sub.id ? "default" : "outline"}
+                        onClick={() => setSelectedSubcategory(sub.id)}
+                        size="sm"
+                        className="gap-1"
+                      >
+                        <span>{sub.icon}</span>
+                        {sub.name}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
-            {myServices && myServices.length > 0 ? (
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {myServices.map((service) => (
-                  <Card key={service.id} className="p-6">
-                    <h3 className="text-xl font-bold mb-2">{service.title}</h3>
-                    <p className="text-foreground/70 text-sm mb-4">{service.description}</p>
-                    <div className="flex justify-between items-center">
-                      <span className="text-2xl font-bold text-secondary">${service.price}</span>
-                      <Button variant="outline" size="sm">
-                        Edit
+            {/* Results Count */}
+            <div className="mb-6">
+              <p className="text-sm text-muted-foreground">
+                Showing {filteredFreelancers.length} freelancer{filteredFreelancers.length !== 1 ? 's' : ''}
+                {selectedSubcategory && ` in ${subcategories.find(s => s.id === selectedSubcategory)?.name}`}
+              </p>
+            </div>
+
+            {/* Freelancers Grid */}
+            {filteredFreelancers.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredFreelancers.map(freelancer => (
+                  <Card key={freelancer.id} className="flex flex-col hover:shadow-lg transition-shadow overflow-hidden">
+                    {/* Header */}
+                    <div className="bg-gradient-to-r from-primary/10 to-secondary/10 p-4 border-b border-border">
+                      <div className="flex items-start justify-between mb-2">
+                        <h3 className="text-lg font-bold">{freelancer.name}</h3>
+                        <div className="flex items-center gap-1 bg-yellow-100 dark:bg-yellow-900 px-2 py-1 rounded-full">
+                          <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                          <span className="font-semibold text-sm">{freelancer.rating}</span>
+                        </div>
+                      </div>
+                      <p className="text-sm text-muted-foreground">{freelancer.description}</p>
+                    </div>
+
+                    {/* Content */}
+                    <div className="flex-1 p-4 space-y-4">
+                      {/* Stats */}
+                      <div className="grid grid-cols-3 gap-3">
+                        <div className="text-center p-2 bg-background rounded-lg border border-border">
+                          <p className="text-xs text-muted-foreground mb-1">Reviews</p>
+                          <p className="font-bold">{freelancer.reviews}</p>
+                        </div>
+                        <div className="text-center p-2 bg-background rounded-lg border border-border">
+                          <p className="text-xs text-muted-foreground mb-1">Projects</p>
+                          <p className="font-bold">{freelancer.completedProjects}</p>
+                        </div>
+                        <div className="text-center p-2 bg-background rounded-lg border border-border">
+                          <p className="text-xs text-muted-foreground mb-1">Response</p>
+                          <p className="font-bold text-xs">{freelancer.responseTime}</p>
+                        </div>
+                      </div>
+
+                      {/* Portfolio */}
+                      <div>
+                        <p className="text-sm font-medium mb-2">Portfolio</p>
+                        <ul className="space-y-1">
+                          {freelancer.portfolio.map((item, idx) => (
+                            <li key={idx} className="text-sm text-muted-foreground flex items-center gap-2">
+                              <span className="w-1 h-1 bg-primary rounded-full" />
+                              {item}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+
+                    {/* Footer */}
+                    <div className="border-t border-border p-4 flex items-center justify-between">
+                      <div>
+                        <p className="text-xs text-muted-foreground">Starting at</p>
+                        <p className="text-2xl font-bold text-primary">${freelancer.price}</p>
+                      </div>
+                      <Button className="bg-secondary hover:bg-secondary/90 text-primary gap-2">
+                        <MessageSquare className="w-4 h-4" />
+                        Hire
                       </Button>
                     </div>
                   </Card>
@@ -244,9 +387,9 @@ export default function FreelanceHub() {
               </div>
             ) : (
               <div className="text-center py-12">
-                <p className="text-foreground/70 mb-4">You haven't created any services yet.</p>
-                <Button className="bg-secondary hover:bg-secondary/90 text-primary">
-                  Create Your First Service
+                <p className="text-lg text-muted-foreground mb-4">No freelancers found matching your criteria</p>
+                <Button onClick={() => { setSearchTerm(""); setSelectedCategory(undefined); setSelectedSubcategory(undefined); }}>
+                  Clear Filters
                 </Button>
               </div>
             )}
@@ -254,64 +397,26 @@ export default function FreelanceHub() {
         </section>
       )}
 
-      {/* My Projects */}
-      {viewMode === "myProjects" && (
+      {/* My Services / My Projects - Placeholder */}
+      {viewMode === "myServices" && (
         <section className="py-16 bg-background">
-          <div className="container">
-            <h2 className="text-3xl font-bold mb-8">My Projects</h2>
-
-            {myProjects && myProjects.length > 0 ? (
-              <div className="space-y-4">
-                {myProjects.map((project) => (
-                  <Card key={project.id} className="p-6 hover:shadow-lg transition-shadow">
-                    <div className="flex justify-between items-start mb-4">
-                      <div>
-                        <h3 className="text-xl font-bold">{project.title}</h3>
-                        <p className="text-foreground/70 text-sm">{project.category}</p>
-                      </div>
-                      <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                        project.status === "completed"
-                          ? "bg-green-500/20 text-green-700"
-                          : project.status === "active"
-                          ? "bg-blue-500/20 text-blue-700"
-                          : "bg-yellow-500/20 text-yellow-700"
-                      }`}>
-                        {project.status}
-                      </span>
-                    </div>
-                    <p className="text-foreground/70 mb-4">{project.description}</p>
-                    <div className="flex justify-between items-center">
-                      <span className="text-2xl font-bold text-secondary">
-                        ${project.projectPrice}
-                      </span>
-                      <Button variant="outline" className="gap-2">
-                        <MessageSquare className="w-4 h-4" />
-                        Message
-                      </Button>
-                    </div>
-                  </Card>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-12">
-                <p className="text-foreground/70">You don't have any projects yet.</p>
-              </div>
-            )}
+          <div className="container max-w-6xl mx-auto px-4">
+            <div className="text-center">
+              <p className="text-lg text-muted-foreground">My Services section coming soon</p>
+            </div>
           </div>
         </section>
       )}
 
-      {/* Footer */}
-      <footer className="bg-primary/80 text-white py-8 border-t border-border">
-        <div className="container text-center">
-          <p className="text-white/70 mb-4">
-            © 2026 Benny's Emporium Freelance Solutions. All rights reserved.
-          </p>
-          <Link href="/" className="text-secondary hover:text-secondary/80 transition-colors inline-block">
-            ← Back to Home
-          </Link>
-        </div>
-      </footer>
+      {viewMode === "myProjects" && (
+        <section className="py-16 bg-background">
+          <div className="container max-w-6xl mx-auto px-4">
+            <div className="text-center">
+              <p className="text-lg text-muted-foreground">My Projects section coming soon</p>
+            </div>
+          </div>
+        </section>
+      )}
     </div>
   );
 }
