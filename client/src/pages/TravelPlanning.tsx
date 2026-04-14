@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, MapPin, Plane, Hotel, Ship, Calendar, Users, DollarSign, CheckCircle2, Ticket, Utensils, Dumbbell, Music, Car, Heart } from "lucide-react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { useState } from "react";
 import TestimonialsCarousel from "@/components/TestimonialsCarousel";
 import SearchFilter from "@/components/SearchFilter";
@@ -14,6 +14,7 @@ import SearchFilter from "@/components/SearchFilter";
 */
 
 export default function TravelPlanning() {
+  const [, navigate] = useLocation();
   const [activeTab, setActiveTab] = useState<'all' | 'flights' | 'hotels' | 'cruises' | 'experiences'>('all');
 
   const testimonials = [
@@ -242,6 +243,7 @@ export default function TravelPlanning() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
             <Button
+              onClick={() => navigate("/quote-request")}
               className="btn-luxury bg-secondary hover:bg-secondary/90 text-primary font-bold py-3 px-8 rounded-full text-lg"
             >
               Request a Quote
@@ -431,7 +433,7 @@ export default function TravelPlanning() {
             <div className="bg-white/10 border border-white/20 rounded-lg p-8 backdrop-blur-sm">
               <h3 className="text-2xl font-bold mb-4">Quick Quote</h3>
               <p className="text-white/80 mb-6">Get instant pricing for your travel and lifestyle plans</p>
-              <Button className="w-full bg-secondary hover:bg-secondary/90 text-primary font-bold py-3 rounded-full">
+              <Button onClick={() => navigate("/quote-request")} className="w-full bg-secondary hover:bg-secondary/90 text-primary font-bold py-3 rounded-full">
                 Request Quote
               </Button>
             </div>

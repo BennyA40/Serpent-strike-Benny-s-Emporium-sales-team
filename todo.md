@@ -1,54 +1,43 @@
-# Benny's Emporium — Battalion Integration TODO
+# Benny's Emporium — TODO
 
-## Phase 1: Planning & Architecture
-- [ ] Design battalion data schema with squad/agent relationships
-- [ ] Map commission flow across Travel, Freelance, Loans pillars
-- [ ] Plan role-based access control (Shelby, Merle, agents, admins)
-- [ ] Define real-time metrics and KPIs
+## Current Sprint: Quote Button Fix & Travel Vendor Directory
 
-## Phase 2: Database Schema
-- [ ] Extend schema with battalion tables (squads, agents, assignments)
-- [ ] Add commission tracking tables
-- [ ] Create relationships between agents and bookings/projects/loans
-- [ ] Run pnpm db:push to migrate
+### Quote Request System
+- [x] Fix Request a Quote button navigation
+- [x] Create QuoteRequest page (/quote-request)
+- [x] Add quote form with basic fields
+- [x] Link button from Home and TravelPlanning pages
 
-## Phase 3: Backend tRPC Procedures
-- [ ] Build procedures for squad management
-- [ ] Build procedures for agent performance tracking
-- [ ] Build procedures for real-time commission calculations
-- [ ] Build procedures for payout management
+### Travel Vendor Directory
+- [x] Create TravelVendorDirectory page (/travel-vendors)
+- [x] Add Cruise Lines category (Royal Caribbean, Carnival, Norwegian, MSC, Princess, Celebrity, Holland America, Disney Cruise Line)
+- [x] Add Resorts category (Sandals, Beaches, AMR Collection, RIU, Iberostar, Club Med, Karisma, Palace Resorts)
+- [x] Add Booking Engines category (VAX VacationAccess, Expedia TAAP, Priceline Partner Network, Travel Impressions, Funjet, Apple Vacations, Pleasant Holidays)
+- [x] Add Hotels category (Marriott, Hilton, Hyatt, IHG, Wyndham)
+- [x] Add Airlines category (American, Delta, United, Southwest, JetBlue, Alaska)
+- [x] Add placeholder credential fields for each vendor
+- [ ] Create backend tRPC procedures for vendor management
 
-## Phase 4: Admin Dashboard
-- [ ] Create battalion command center page
-- [ ] Implement role-based access (Shelby/Merle only)
-- [ ] Build squad overview and agent roster
-- [ ] Add real-time performance metrics
-
-## Phase 5: Agent Performance & Leaderboards
-- [ ] Build agent leaderboard by pillar
-- [ ] Create individual agent dashboards
-- [ ] Implement performance trending
-- [ ] Add achievement badges
-
-## Phase 6: Commission System
-- [ ] Implement real-time commission calculations
-- [ ] Build payout scheduling
-- [ ] Create commission audit logs
-- [ ] Add commission dispute resolution
-
-## Phase 7: Pillar Integration
-- [ ] Link Travel bookings to agent commissions
-- [ ] Link Freelance projects to agent commissions
-- [ ] Link Loan applications to agent commissions
-- [ ] Display squad metrics on each pillar page
-
-## Phase 8: Testing
-- [ ] Write vitest tests for commission logic
-- [ ] Test role-based access control
-- [ ] Test real-time metric updates
-- [ ] Test payout calculations
-
-## Phase 9: Delivery
+### Integration
+- [x] Add routes to App.tsx
+- [x] Update navigation to link to vendor directory
+- [x] Test all navigation flows
 - [ ] Save checkpoint
-- [ ] Document integration
-- [ ] Verify all systems operational
+
+## Completed Features
+
+### Battalion Integration (Completed)
+- [x] Database schema with squads, agents, assignments, commissions, metrics
+- [x] Backend tRPC procedures for battalion operations
+- [x] Battalion Command Center admin dashboard
+- [x] Role-based access control
+- [x] Agent leaderboards and performance tracking
+- [x] Vitest tests (13 passing)
+
+### Core Features (Completed)
+- [x] Home page with hero and service cards
+- [x] Travel Planning page
+- [x] Bookings Dashboard
+- [x] Freelance Hub
+- [x] Loan Hub
+- [x] Destination pages (Paris, Bali, Tokyo, Caribbean, New York, Dubai)

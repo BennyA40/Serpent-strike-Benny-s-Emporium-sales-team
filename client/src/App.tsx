@@ -16,6 +16,8 @@ import Caribbean from "./pages/destinations/Caribbean";
 import NewYork from "./pages/destinations/NewYork";
 import Dubai from "./pages/destinations/Dubai";
 import BattalionCommandCenter from "./pages/BattalionCommandCenter";
+import QuoteRequest from "./pages/QuoteRequest";
+import TravelVendorDirectory from "./pages/TravelVendorDirectory";
 function Router() {
   // make sure to consider if you need authentication for certain routes
   return (
@@ -32,6 +34,8 @@ function Router() {
       <Route path={"/destinations/new-york"} component={NewYork} />
       <Route path={"/destinations/dubai"} component={Dubai} />
       <Route path={"/battalion"} component={BattalionCommandCenter} />
+      <Route path={"/quote-request"} component={QuoteRequest} />
+      <Route path={"/travel-vendors"} component={TravelVendorDirectory} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
