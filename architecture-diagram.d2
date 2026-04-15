@@ -1,0 +1,153 @@
+direction: down
+
+# Main Emporium Hub
+Emporium: "BENNY'S EMPORIUM" {
+  style: {
+    fill: "#1a1a2e"
+    stroke: "#d4af37"
+    stroke-width: 3
+  }
+}
+
+# Three Main Pillars
+Travel: "TRAVEL SOLUTIONS" {
+  style: {
+    fill: "#16213e"
+    stroke: "#e94560"
+    stroke-width: 2
+  }
+}
+
+Freelance: "FREELANCE SOLUTIONS" {
+  style: {
+    fill: "#16213e"
+    stroke: "#00d4ff"
+    stroke-width: 2
+  }
+}
+
+Loans: "LOAN BROKERING" {
+  style: {
+    fill: "#16213e"
+    stroke: "#00ff88"
+    stroke-width: 2
+  }
+}
+
+# Freelance Categories
+Writing: "WRITING" {
+  style: { fill: "#0f3460" }
+}
+
+WebDesign: "WEB DESIGN" {
+  style: { fill: "#0f3460" }
+}
+
+VideoEditing: "VIDEO EDITING" {
+  style: { fill: "#0f3460" }
+}
+
+Consulting: "CONSULTING" {
+  style: { fill: "#0f3460" }
+}
+
+Programming: "PROGRAMMING" {
+  style: { fill: "#0f3460" }
+}
+
+Marketing: "MARKETING" {
+  style: { fill: "#0f3460" }
+}
+
+Music: "MUSIC" {
+  style: { fill: "#0f3460" }
+}
+
+# Writing Subcategories
+WritingSub1: "Writer–Auctioneer\nRitual Copywriter\nMicro–Story Artisan" {
+  style: { fill: "#1a1a2e", font-size: 10 }
+}
+
+WritingSub2: "Conversion Bard\nPersona Architect\nTechnical Summarist" {
+  style: { fill: "#1a1a2e", font-size: 10 }
+}
+
+WritingSub3: "Ghostwriter for Founders\nEmotional Logic Writer\nWorldbuilding Scribe\nDialogue Tailor\nBrand Scripture Writer" {
+  style: { fill: "#1a1a2e", font-size: 10 }
+}
+
+# Web Design Subcategories
+DesignSub1: "UX Ritualist\nMicro–Interaction Designer\nConversion Layout Engineer" {
+  style: { fill: "#1a1a2e", font-size: 10 }
+}
+
+DesignSub2: "Brand–First Web Stylist\nNo–Code / Webflow Specialist\nAccessibility–Focused Designer" {
+  style: { fill: "#1a1a2e", font-size: 10 }
+}
+
+DesignSub3: "Responsive Layout Technician\nDesign System Builder" {
+  style: { fill: "#1a1a2e", font-size: 10 }
+}
+
+# Video Editing Subcategories
+VideoSub1: "Cinematic Story Cutter\nSocial Pulse Editor\nMotion Graphics Alchemist" {
+  style: { fill: "#1a1a2e", font-size: 10 }
+}
+
+VideoSub2: "Documentary Narrative Editor\nMusic–Synced Visual Cutter\nColor Grading Specialist" {
+  style: { fill: "#1a1a2e", font-size: 10 }
+}
+
+VideoSub3: "Commercial Spot Editor\nLong–Form Content Editor" {
+  style: { fill: "#1a1a2e", font-size: 10 }
+}
+
+# Consulting Subcategories
+ConsultingSub: "Systems & Workflow Architect\nBrand Identity Strategist\nBusiness Clarity Consultant\nDigital Transformation Advisor\nMarket Positioning Analyst\nOperational Efficiency Consultant\nCustomer Experience Designer" {
+  style: { fill: "#1a1a2e", font-size: 10 }
+}
+
+# Programming Subcategories
+ProgrammingSub: "Full–Stack Problem Solver\nAPI Integration Specialist\nNo–Code / Low–Code Engineer\nPerformance & Optimization Developer\nSecurity & Compliance Coder\nFrontend Interaction Developer\nBackend Logic Engineer" {
+  style: { fill: "#1a1a2e", font-size: 10 }
+}
+
+# Marketing Subcategories
+MarketingSub: "Funnel & Conversion Strategist\nSocial Presence Architect\nPaid Ads Technician\nCommunity Growth Engineer\nAnalytics & Insights Specialist\nContent Calendar Architect\nBrand Awareness Strategist" {
+  style: { fill: "#1a1a2e", font-size: 10 }
+}
+
+# Music Subcategories
+MusicSub: "Genre–Fusion Composer\nVocal Production Specialist\nBeat Architect\nMixing & Mastering Engineer\nSound Identity Designer\nScore & Atmosphere Composer\nSession Musician (Remote)" {
+  style: { fill: "#1a1a2e", font-size: 10 }
+}
+
+# Connections
+Emporium -> Travel
+Emporium -> Freelance
+Emporium -> Loans
+
+Freelance -> Writing
+Freelance -> WebDesign
+Freelance -> VideoEditing
+Freelance -> Consulting
+Freelance -> Programming
+Freelance -> Marketing
+Freelance -> Music
+
+Writing -> WritingSub1
+Writing -> WritingSub2
+Writing -> WritingSub3
+
+WebDesign -> DesignSub1
+WebDesign -> DesignSub2
+WebDesign -> DesignSub3
+
+VideoEditing -> VideoSub1
+VideoEditing -> VideoSub2
+VideoEditing -> VideoSub3
+
+Consulting -> ConsultingSub
+Programming -> ProgrammingSub
+Marketing -> MarketingSub
+Music -> MusicSub

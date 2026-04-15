@@ -1,146 +1,207 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { MapPin, Phone, Mail, Plane, Code, DollarSign, Zap } from "lucide-react";
-import { useState } from "react";
-
-/* Design System: Modern Luxury Marketplace
-   - Hero: Deep charcoal with copper-gold accents, asymmetric layout
-   - Services: Card-based grid with lift effects on hover
-   - About: Dark section with warm typography
-   - Contact: Clear CTA with multiple engagement paths
-   - Interactions: Smooth transitions, staggered animations
-*/
+import { Card } from "@/components/ui/card";
+import { useLocation } from "wouter";
+import { Plane, Briefcase, DollarSign, ArrowRight, Star, Zap, Shield, Users, TrendingUp, Globe } from "lucide-react";
 
 export default function Home() {
-  // The userAuth hooks provides authentication state
-  // To implement login/logout functionality, simply call logout() or redirect to getLoginUrl()
-  let { user, loading, error, isAuthenticated, logout } = useAuth();
-
-  const [activeService, setActiveService] = useState<number | null>(null);
-
-  const services = [
-    {
-      id: 1,
-      icon: Plane,
-      title: "Travel & Lifestyle Hub",
-      description: "Flights, hotels, car rentals, cruises, wellness retreats, adventure activities, fine dining, sports tickets, concert tickets, and unforgettable experiences — all integrated in one place.",
-      color: "from-amber-400 to-orange-400"
-    },
-    {
-      id: 2,
-      icon: Code,
-      title: "Freelance Solutions",
-      description: "Connect with top talent or find gigs — web design, writing, consulting, creative work, and beyond.",
-      color: "from-blue-400 to-cyan-400"
-    },
-    {
-      id: 3,
-      icon: DollarSign,
-      title: "Loan Brokering",
-      description: "Competitive rates, personalized options — we broker loans for personal, business, travel, or investment needs.",
-      color: "from-emerald-400 to-teal-400"
-    },
-    {
-      id: 4,
-      icon: Zap,
-      title: "And Much More...",
-      description: "Consulting, partnerships, custom projects — if it's ambitious and exciting, Benny's Emporium has you covered.",
-      color: "from-purple-400 to-indigo-400"
-    }
-  ];
+  const [, navigate] = useLocation();
+  const { user, loading, isAuthenticated, logout } = useAuth();
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      {/* Navigation */}
-      <nav className="fixed top-0 w-full bg-primary/95 backdrop-blur-sm z-50 shadow-sm">
-        <div className="container flex items-center justify-between py-4">
-          <h1 className="text-2xl font-bold text-secondary">Benny's Emporium</h1>
-          <ul className="hidden md:flex gap-8">
-            <li><a href="#home" className="hover:text-secondary transition-colors">Home</a></li>
-            <li><a href="#services" className="hover:text-secondary transition-colors">Services</a></li>
-            <li><a href="#about" className="hover:text-secondary transition-colors">About</a></li>
-            <li><a href="#contact" className="hover:text-secondary transition-colors">Contact</a></li>
-          </ul>
-        </div>
-      </nav>
-
       {/* Hero Section */}
-      <header
-        id="home"
-        className="relative pt-32 pb-24 overflow-hidden"
-        style={{
-          backgroundImage: `url('https://d2xsxph8kpxj0f.cloudfront.net/310519663342087978/hpMFvQgt7mSt3LmbrDcdGW/hero-background-ARQSEKJVpkFyGn3iesDoqe.webp')`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundAttachment: 'fixed'
-        }}
-      >
-        <div className="absolute inset-0 bg-primary/40"></div>
-        <div className="container relative z-10">
-          <div className="max-w-2xl">
-            <h1 className="text-5xl md:text-6xl font-bold text-white mb-6 leading-tight">
-              Your Gateway to Endless Opportunities
+      <section className="relative overflow-hidden py-20 md:py-32 border-b border-border">
+        {/* Background gradient */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5" />
+        
+        <div className="container max-w-6xl mx-auto px-4 relative z-10">
+          <div className="max-w-3xl">
+            <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
+              Your Gateway to <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">Endless Opportunities</span>
             </h1>
-            <p className="text-xl text-white/90 mb-8 leading-relaxed">
-              Travel adventures, leisure escapes, freelance expertise, loan brokering, and so much more — all under one trusted roof.
+            <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
+              Travel adventures, freelance expertise, loan brokering, and so much more — all under one trusted roof. Benny's Emporium is your sovereign capital hub for everything.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Button
-                asChild
-                className="btn-luxury bg-secondary hover:bg-secondary/90 text-primary font-bold py-3 px-8 rounded-full text-lg"
+                onClick={() => navigate("/travel-planning")}
+                size="lg"
+                className="gap-2"
               >
-                <a href="#services">Explore Our World</a>
+                Explore Our World
+                <ArrowRight className="w-5 h-5" />
               </Button>
               <Button
-                asChild
-                className="btn-luxury bg-white/20 hover:bg-white/30 text-white font-bold py-3 px-8 rounded-full text-lg border border-white/40"
+                variant="outline"
+                size="lg"
+                onClick={() => navigate("/freelance")}
               >
-                <a href="#contact">Get in Touch</a>
+                Browse Expertise
               </Button>
             </div>
           </div>
         </div>
-      </header>
+      </section>
 
-      {/* Services Section */}
-      <section id="services" className="py-24 bg-background">
-        <div className="container">
-          <div className="mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-center text-primary mb-4">
-              What We Offer
-            </h2>
-            <div className="section-divider"></div>
+      {/* Three Pillars */}
+      <section className="py-20 border-b border-border">
+        <div className="container max-w-6xl mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold mb-4">The Emporium Pillars</h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Three distinct ecosystems, seamlessly integrated. From wanderlust to expertise to capital, we've got you covered.
+            </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {services.map((service, index) => {
-              const IconComponent = service.icon;
-              return (
-                <div
-                  key={service.id}
-                  className="service-card-luxury group cursor-pointer"
-                  onMouseEnter={() => setActiveService(service.id)}
-                  onMouseLeave={() => setActiveService(null)}
-                  style={{
-                    animation: `fadeInUp 0.6s ease-out ${index * 0.1}s both`
-                  }}
-                >
-                  <div className="flex items-center gap-4 mb-4">
-                    <div className={`p-3 rounded-lg bg-gradient-to-br ${service.color}`}>
-                      <IconComponent className="w-6 h-6 text-white" />
-                    </div>
-                    <h3 className="text-xl font-bold">{service.title}</h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* Travel Pillar */}
+            <Card className="overflow-hidden hover:shadow-xl transition-shadow group">
+              <div className="h-32 bg-gradient-to-br from-red-400 to-orange-400 relative overflow-hidden">
+                <Plane className="absolute bottom-0 right-0 w-24 h-24 opacity-20 transform translate-x-4 translate-y-4" />
+              </div>
+              <div className="p-8">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-12 h-12 bg-red-100 dark:bg-red-900 rounded-lg flex items-center justify-center">
+                    <Plane className="w-6 h-6 text-red-600 dark:text-red-400" />
                   </div>
-                  <p className="text-foreground/70 leading-relaxed">
-                    {service.description}
-                  </p>
-                  {activeService === service.id && (
-                    <div className="mt-4 pt-4 border-t border-secondary/20">
-                      <a href={service.id === 1 ? "/travel-planning" : service.id === 2 ? "/freelance" : service.id === 3 ? "/loans" : "#contact"} className="text-secondary font-semibold hover:text-secondary/80 transition-colors inline-flex items-center gap-2">
-                        Learn More →
-                      </a>
-                    </div>
-                  )}
+                  <h3 className="text-2xl font-bold">Travel Solutions</h3>
+                </div>
+                <p className="text-muted-foreground mb-6">
+                  Flights, hotels, cruises, resorts, and unforgettable experiences. Your complete travel companion.
+                </p>
+                <ul className="space-y-2 mb-6 text-sm">
+                  <li className="flex items-center gap-2">
+                    <Zap className="w-4 h-4 text-primary" />
+                    <span>Instant booking & quotes</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Zap className="w-4 h-4 text-primary" />
+                    <span>Curated destinations</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Zap className="w-4 h-4 text-primary" />
+                    <span>Expert recommendations</span>
+                  </li>
+                </ul>
+                <Button
+                  onClick={() => navigate("/travel-planning")}
+                  variant="outline"
+                  className="w-full gap-2 group-hover:bg-red-50 dark:group-hover:bg-red-900/20"
+                >
+                  Explore Travel
+                  <ArrowRight className="w-4 h-4" />
+                </Button>
+              </div>
+            </Card>
+
+            {/* Freelance Pillar */}
+            <Card className="overflow-hidden hover:shadow-xl transition-shadow group border-2 border-primary">
+              <div className="h-32 bg-gradient-to-br from-blue-400 to-cyan-400 relative overflow-hidden">
+                <Briefcase className="absolute bottom-0 right-0 w-24 h-24 opacity-20 transform translate-x-4 translate-y-4" />
+              </div>
+              <div className="p-8">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center">
+                    <Briefcase className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                  </div>
+                  <h3 className="text-2xl font-bold">Freelance Solutions</h3>
+                </div>
+                <p className="text-muted-foreground mb-6">
+                  7 categories, 50+ specialized roles. Find world-class talent for any project.
+                </p>
+                <ul className="space-y-2 mb-6 text-sm">
+                  <li className="flex items-center gap-2">
+                    <Zap className="w-4 h-4 text-primary" />
+                    <span>Writing & copywriting</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Zap className="w-4 h-4 text-primary" />
+                    <span>Design & development</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Zap className="w-4 h-4 text-primary" />
+                    <span>Video, music & consulting</span>
+                  </li>
+                </ul>
+                <Button
+                  onClick={() => navigate("/freelance")}
+                  className="w-full gap-2"
+                >
+                  Browse Freelancers
+                  <ArrowRight className="w-4 h-4" />
+                </Button>
+              </div>
+            </Card>
+
+            {/* Loans Pillar */}
+            <Card className="overflow-hidden hover:shadow-xl transition-shadow group">
+              <div className="h-32 bg-gradient-to-br from-green-400 to-emerald-400 relative overflow-hidden">
+                <DollarSign className="absolute bottom-0 right-0 w-24 h-24 opacity-20 transform translate-x-4 translate-y-4" />
+              </div>
+              <div className="p-8">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-12 h-12 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center">
+                    <DollarSign className="w-6 h-6 text-green-600 dark:text-green-400" />
+                  </div>
+                  <h3 className="text-2xl font-bold">Loan Brokering</h3>
+                </div>
+                <p className="text-muted-foreground mb-6">
+                  Fast funding, competitive rates, personalized options. Capital when you need it.
+                </p>
+                <ul className="space-y-2 mb-6 text-sm">
+                  <li className="flex items-center gap-2">
+                    <Zap className="w-4 h-4 text-primary" />
+                    <span>Quick qualification</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Zap className="w-4 h-4 text-primary" />
+                    <span>Multiple lender options</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Zap className="w-4 h-4 text-primary" />
+                    <span>Transparent terms</span>
+                  </li>
+                </ul>
+                <Button
+                  onClick={() => navigate("/loans")}
+                  variant="outline"
+                  className="w-full gap-2 group-hover:bg-green-50 dark:group-hover:bg-green-900/20"
+                >
+                  Get Funded
+                  <ArrowRight className="w-4 h-4" />
+                </Button>
+              </div>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* Why Benny's */}
+      <section className="py-20 border-b border-border bg-muted/30">
+        <div className="container max-w-6xl mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold mb-4">Why Benny's Emporium?</h2>
+            <p className="text-lg text-muted-foreground">
+              We're not just a marketplace — we're your trusted partner in opportunity.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              { icon: Shield, title: "Vetted Experts", desc: "All professionals verified and rated" },
+              { icon: TrendingUp, title: "Real Results", desc: "Proven track records and testimonials" },
+              { icon: Globe, title: "Global Reach", desc: "Access talent and opportunities worldwide" },
+              { icon: Users, title: "Community", desc: "Join thousands of satisfied users" }
+            ].map((item, idx) => {
+              const Icon = item.icon;
+              return (
+                <div key={idx} className="text-center">
+                  <div className="w-16 h-16 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4">
+                    <Icon className="w-8 h-8 text-primary" />
+                  </div>
+                  <h3 className="font-bold mb-2">{item.title}</h3>
+                  <p className="text-sm text-muted-foreground">{item.desc}</p>
                 </div>
               );
             })}
@@ -148,101 +209,78 @@ export default function Home() {
         </div>
       </section>
 
-      {/* About Section */}
-      <section id="about" className="py-24 bg-primary text-white">
-        <div className="container">
-          <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-4xl md:text-5xl font-bold mb-8">
-              About Benny's Emporium
-            </h2>
-            <p className="text-lg leading-relaxed text-white/90 mb-8">
-              Founded with a passion for opportunity and adventure, Benny's Emporium is more than a business — it's a gateway to the experiences, services, and financial solutions you've been searching for. Whether you're planning your next getaway, seeking freelance freedom, or exploring smart financing, we're here to make it happen with expertise, integrity, and a personal touch.
+      {/* Featured Packages */}
+      <section className="py-20 border-b border-border">
+        <div className="container max-w-6xl mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold mb-4">Popular Packages</h2>
+            <p className="text-lg text-muted-foreground mb-8">
+              Curated offerings across all three pillars
             </p>
-            <div className="inline-block px-8 py-1 bg-secondary/20 rounded-full border border-secondary/40">
-              <p className="text-secondary font-semibold">Trusted by thousands • Est. 2026</p>
-            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            {[
+              { title: "Bali Escape", price: "$2,499", rating: 4.9, reviews: 342 },
+              { title: "Website Redesign", price: "$5,000", rating: 4.8, reviews: 189 },
+              { title: "Business Loan", price: "From $10K", rating: 4.7, reviews: 256 }
+            ].map((pkg, idx) => (
+              <Card key={idx} className="p-6 hover:shadow-lg transition-shadow">
+                <h3 className="text-xl font-bold mb-2">{pkg.title}</h3>
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="flex items-center gap-1">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                    ))}
+                  </div>
+                  <span className="text-sm text-muted-foreground">({pkg.reviews})</span>
+                </div>
+                <p className="text-2xl font-bold text-primary mb-4">{pkg.price}</p>
+                <Button className="w-full">Learn More</Button>
+              </Card>
+            ))}
+          </div>
+
+          <div className="text-center">
+            <Button
+              onClick={() => navigate("/packages")}
+              variant="outline"
+              size="lg"
+              className="gap-2"
+            >
+              Browse All Packages
+              <ArrowRight className="w-5 h-5" />
+            </Button>
           </div>
         </div>
       </section>
 
-      {/* Contact Section */}
-      <section id="contact" className="py-24 bg-background">
-        <div className="container">
-          <div className="max-w-3xl mx-auto">
-            <h2 className="text-4xl md:text-5xl font-bold text-center text-primary mb-4">
-              Let's Connect
-            </h2>
-            <div className="section-divider"></div>
-
-            <p className="text-center text-lg text-foreground/70 mb-12">
-              Ready to turn ideas into reality? Drop us a line — we're excited to hear from you!
-            </p>
-
-            <div className="grid md:grid-cols-2 gap-8 mb-12">
-              <Button
-                asChild
-                className="btn-luxury bg-secondary hover:bg-secondary/90 text-primary font-bold py-4 px-8 rounded-full text-lg h-auto"
-              >
-                <a href="mailto:benny@bennysemporium.com" className="flex items-center justify-center gap-3">
-                  <Mail className="w-5 h-5" />
-                  Email Us
-                </a>
-              </Button>
-              <Button
-                asChild
-                className="btn-luxury bg-primary hover:bg-primary/90 text-white font-bold py-4 px-8 rounded-full text-lg h-auto"
-              >
-                <a href="tel:+15551234567" className="flex items-center justify-center gap-3">
-                  <Phone className="w-5 h-5" />
-                  Call Now
-                </a>
-              </Button>
-            </div>
-
-            <div className="bg-card border border-border rounded-lg p-8 text-center">
-              <div className="flex flex-col md:flex-row items-center justify-center gap-6 text-foreground/70">
-                <div className="flex items-center gap-2">
-                  <Mail className="w-5 h-5 text-secondary" />
-                  <span>ligersama777@gmail.com</span>
-                </div>
-                <div className="hidden md:block w-px h-6 bg-border"></div>
-                <div className="flex items-center gap-2">
-                  <MapPin className="w-5 h-5 text-secondary" />
-                  <span>Allentown, PA</span>
-                </div>
-                <div className="hidden md:block w-px h-6 bg-border"></div>
-                <div className="flex items-center gap-2">
-                  <Phone className="w-5 h-5 text-secondary" />
-                  <span>484-201-7626</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="bg-primary text-white py-8">
-        <div className="container text-center">
-          <p className="text-white/70">
-            © 2026 Benny's Emporium. All rights reserved. | Built with passion for endless possibilities.
+      {/* CTA Section */}
+      <section className="py-20 bg-gradient-to-r from-primary/10 to-secondary/10">
+        <div className="container max-w-6xl mx-auto px-4 text-center">
+          <h2 className="text-4xl font-bold mb-4">Ready to Get Started?</h2>
+          <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+            Whether you're seeking adventure, expertise, or capital, Benny's Emporium has the solution.
           </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button
+              onClick={() => navigate("/travel-planning")}
+              size="lg"
+              className="gap-2"
+            >
+              Start Exploring
+              <ArrowRight className="w-5 h-5" />
+            </Button>
+            <Button
+              variant="outline"
+              size="lg"
+              onClick={() => navigate("/freelancer/signup")}
+            >
+              Become a Partner
+            </Button>
+          </div>
         </div>
-      </footer>
-
-      {/* Animation Styles */}
-      <style>{`
-        @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-      `}</style>
+      </section>
     </div>
   );
 }
