@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/Serpent-strike-Benny-s-Emporium-sales-team/static/css/main.842cc5a0.css",
+    "main.js": "/Serpent-strike-Benny-s-Emporium-sales-team/static/js/main.b430818e.js",
+    "index.html": "/Serpent-strike-Benny-s-Emporium-sales-team/index.html",
+    "main.842cc5a0.css.map": "/Serpent-strike-Benny-s-Emporium-sales-team/static/css/main.842cc5a0.css.map",
+    "main.b430818e.js.map": "/Serpent-strike-Benny-s-Emporium-sales-team/static/js/main.b430818e.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.842cc5a0.css",
+    "static/js/main.b430818e.js"
+  ]
+}
