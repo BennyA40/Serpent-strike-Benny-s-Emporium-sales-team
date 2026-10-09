@@ -79,6 +79,11 @@
       <input type="file" id="fileIn" accept="audio/*" style="display:none"/>
       <button id="stopBtn" class="warn" disabled>■ STOP</button>
     </div>
+    <div class="row">
+      <button id="recBtn" disabled>● REC <span class="note">· post-jewel master</span></button>
+      <button id="dlWavBtn" disabled>⬇ DOWNLOAD TAKE (.wav)</button>
+      <span class="mono" id="recStatus" style="font-size:12px;color:var(--dim)"></span>
+    </div>
     <div><label class="lab">Monitor gain</label><input type="range" id="gain" min="0" max="100" value="70"></div>
     <div class="note" id="srcNote">Idle. Choose a source to start the graph — your tap also unlocks the AudioContext.</div>
   </div>
@@ -362,6 +367,7 @@ async function startSource(kind){
     'Running: '+kind+' · amethyst '+(jewel.amethyst?'ON ('+jewel.depthDb+' dB)':'OFF')
     +' · silver voice '+(jewel.silver?'ON':'OFF')+' · sr '+ctx.sampleRate+' Hz';
   document.getElementById('stopBtn').disabled = false;
+  if(!isRecording) document.getElementById('recBtn').disabled = false;
   drawSpectrum(); startRuby();
 }
 let lastFile=null;
@@ -380,6 +386,7 @@ async function playFileBuffer(buf, name){
   s.start(); sources.push(s); t0=ctx.currentTime; running=true; srcKind='file';
   document.getElementById('srcNote').textContent = 'Running: file "'+name+'" → amethyst carve chain.';
   document.getElementById('stopBtn').disabled=false;
+  if(!isRecording) document.getElementById('recBtn').disabled = false;
   drawSpectrum(); startRuby();
 }
 document.getElementById('fileIn').addEventListener('change', async e=>{
@@ -396,7 +403,9 @@ function stopAll(){
   sources=[]; nodes=[];
   if(master){ try{master.disconnect()}catch(e){} }
   running=false; clearInterval(rubyTimer); rubyActive=false;
+  if(isRecording) stopRec(); // finishRec re-enables download when the take lands
   document.getElementById('stopBtn').disabled=true;
+  document.getElementById('recBtn').disabled=true;
   document.getElementById('rubyStatus').textContent='—';
   document.getElementById('srcNote').textContent='Idle.';
 }
@@ -600,6 +609,82 @@ function setSilver(on, profile){
   const prof=document.getElementById('telecomProfile');
   if(profile) prof.value=profile;
 }
+
+/* ════════════════ WAV recording (post-jewel master tap) ════════════════ */
+let rec=null, recChunks=[], recDest=null, recTick=null, recStartT=0, lastTake=null, isRecording=false;
+
+function encodeWAV(buffer){
+  const nCh=buffer.numberOfChannels, sr=buffer.sampleRate, len=buffer.length;
+  const blockAlign=nCh*2, dataSize=len*blockAlign;
+  const ab=new ArrayBuffer(44+dataSize), v=new DataView(ab);
+  const wstr=(o,s)=>{for(let i=0;i<s.length;i++)v.setUint8(o+i,s.charCodeAt(i));};
+  wstr(0,'RIFF'); v.setUint32(4,36+dataSize,true); wstr(8,'WAVE'); wstr(12,'fmt ');
+  v.setUint32(16,16,true); v.setUint16(20,1,true); v.setUint16(22,nCh,true);
+  v.setUint32(24,sr,true); v.setUint32(28,sr*blockAlign,true);
+  v.setUint16(32,blockAlign,true); v.setUint16(34,16,true);
+  wstr(36,'data'); v.setUint32(40,dataSize,true);
+  const chans=[]; for(let c=0;c<nCh;c++) chans.push(buffer.getChannelData(c));
+  let off=44;
+  for(let i=0;i<len;i++) for(let c=0;c<nCh;c++){
+    const s=Math.max(-1,Math.min(1,chans[c][i]));
+    v.setInt16(off, s<0 ? s*0x8000 : s*0x7FFF, true); off+=2;
+  }
+  return new Blob([ab],{type:'audio/wav'});
+}
+function recStamp(sec){
+  sec=Math.floor(sec/1000);
+  return String(Math.floor(sec/60)).padStart(2,'0')+':'+String(sec%60).padStart(2,'0');
+}
+function startRec(){
+  if(!running||!ctx||!master||isRecording) return;
+  if(!window.MediaRecorder){ recStatus('MediaRecorder not available in this browser.'); return; }
+  recDest=ctx.createMediaStreamDestination();
+  master.connect(recDest);
+  recChunks=[];
+  const mime='audio/webm;codecs=opus';
+  try{ rec=new MediaRecorder(recDest.stream, MediaRecorder.isTypeSupported(mime)?{mimeType:mime}:undefined); }
+  catch(e){ recStatus('Recorder failed to start: '+e.message); master.disconnect(recDest); recDest=null; return; }
+  rec.ondataavailable=e=>{ if(e.data&&e.data.size) recChunks.push(e.data); };
+  rec.onstop=finishRec;
+  rec.start(250);
+  isRecording=true; recStartT=performance.now();
+  const jewels='am'+(jewel.amethyst?Math.abs(jewel.depthDb):'off')+'_sv'+(jewel.silver?'on':'off');
+  recTick=setInterval(()=>{
+    recStatus('● REC '+recStamp(performance.now()-recStartT)+' — capturing '+(srcKind||'source')+' ['+jewels+']');
+  },250);
+  recStatus('● REC 00:00 — capturing '+(srcKind||'source')+' ['+jewels+']');
+  document.getElementById('recBtn').innerHTML='■ STOP REC';
+  document.getElementById('dlWavBtn').disabled=true;
+}
+async function finishRec(){
+  clearInterval(recTick); isRecording=false;
+  try{ if(recDest) master.disconnect(recDest); }catch(e){}
+  recDest=null;
+  document.getElementById('recBtn').innerHTML='● REC <span class="note">· post-jewel master</span>';
+  const blob=new Blob(recChunks,{type:(rec&&rec.mimeType)||'audio/webm'});
+  recStatus('Encoding take to WAV…');
+  const stamp=new Date().toISOString().replace(/[:.]/g,'-').slice(0,19);
+  try{
+    const buf=await ctx.decodeAudioData(await blob.arrayBuffer());
+    const wav=encodeWAV(buf);
+    lastTake={blob:wav, name:'yamato-take-'+(srcKind||'src')+'-'+stamp+'.wav'};
+    recStatus('Take ready: '+buf.duration.toFixed(1)+'s · '+(wav.size/1024).toFixed(0)+' KB · '+(buf.sampleRate/1000).toFixed(1)+' kHz 16-bit WAV');
+    document.getElementById('dlWavBtn').disabled=false;
+  }catch(e){
+    lastTake={blob:blob, name:'yamato-take-'+stamp+'.webm'};
+    recStatus('WAV encode failed ('+e.message+') — raw capture offered instead.');
+    document.getElementById('dlWavBtn').disabled=false;
+  }
+}
+function stopRec(){ if(isRecording&&rec&&rec.state!=='inactive'){ try{rec.stop();}catch(e){} } }
+function recStatus(t){ document.getElementById('recStatus').textContent=t; }
+document.getElementById('recBtn').addEventListener('click',()=>{ isRecording?stopRec():startRec(); });
+document.getElementById('dlWavBtn').addEventListener('click',()=>{
+  if(!lastTake) return;
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(lastTake.blob); a.download=lastTake.name; a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),8000);
+});
 
 /* ════════════════ manifest compiler ════════════════ */
 let manifestNodes=[
