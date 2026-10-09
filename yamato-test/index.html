@@ -83,6 +83,31 @@
     <div class="note" id="srcNote">Idle. Choose a source to start the graph — your tap also unlocks the AudioContext.</div>
   </div>
 
+  <!-- CONVERSATION TEST -->
+  <div class="panel" style="margin-bottom:16px">
+    <h2 class="gold">◉ CONVERSATION TEST — A NORMAL CALL</h2>
+    <p class="note" style="margin:0">A short everyday dialogue between a man and a woman — the exact material the
+      Amethyst was built to protect and the Silver Voice to phone-ify. Two ways to run it:</p>
+    <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr))">
+      <div><label class="lab">Man's voice (device speech)</label><select id="manVoice"></select></div>
+      <div><label class="lab">Woman's voice (device speech)</label><select id="womanVoice"></select></div>
+    </div>
+    <div class="row">
+      <button id="convListen" class="primary">▶ LISTEN <span class="note">· device voices</span></button>
+      <button id="convMic">🎙 READ INTO MIC <span class="note">· through the jewels</span></button>
+      <button id="convNext" disabled>NEXT LINE ▸</button>
+      <button id="convStop" class="warn" disabled>■ STOP</button>
+      <label class="lab" style="display:flex;align-items:center;gap:6px;margin:0">
+        <input type="checkbox" id="phoneLine" style="width:auto"> mic via telephone line <span class="note">(Silver Voice 300–3400 Hz)</span>
+      </label>
+    </div>
+    <div id="scriptBox" class="term" style="max-height:230px;color:#dbe4f3"></div>
+    <div class="note" id="convNote">Idle. LISTEN plays the dialogue with the voices above — note: browsers won't let
+      speech-synthesis audio enter the Web Audio graph, so TTS bypasses the jewel chain (honest limitation);
+      the Ruby monitor still tracks the conversation live. READ INTO MIC routes your voice through the full
+      jewel chain — that's the real test: read each highlighted line aloud and flip the jewels.</div>
+  </div>
+
   <!-- JEWELS -->
   <div class="grid" style="margin-bottom:16px">
     <div class="panel jewel">
@@ -232,7 +257,7 @@ function silverVoiceProfile(name){
 let ctx=null, master=null, masterAn=null, ambAn=null, voxAn=null;
 let sources=[], nodes=[], running=false, t0=0, srcKind=null;
 let jewel={ amethyst:true, silver:true, depthDb:-9, telecom:'RU' };
-let rubyTimer=null, lastWall=0, jitterAcc=[];
+let rubyTimer=null, rubyActive=false, lastWall=0, jitterAcc=[];
 
 function makeSurfBuffer(){
   const len = ctx.sampleRate*4, buf = ctx.createBuffer(1,len,ctx.sampleRate), d = buf.getChannelData(0);
@@ -370,7 +395,7 @@ function stopAll(){
   sources.forEach(s=>{ try{s.stop()}catch(e){} try{s.disconnect()}catch(e){} });
   sources=[]; nodes=[];
   if(master){ try{master.disconnect()}catch(e){} }
-  running=false; clearInterval(rubyTimer);
+  running=false; clearInterval(rubyTimer); rubyActive=false;
   document.getElementById('stopBtn').disabled=true;
   document.getElementById('rubyStatus').textContent='—';
   document.getElementById('srcNote').textContent='Idle.';
@@ -390,7 +415,8 @@ bindSwitch('swAmethyst', on=>{
 });
 bindSwitch('swSilver', on=>{
   jewel.silver=on; document.getElementById('swSilLabel').textContent=on?'ENGAGED':'BYPASSED';
-  if(running && (srcKind==='voice'||srcKind==='mixed')) restart();
+  if(!on) document.getElementById('phoneLine').checked=false; // keep the conversation checkbox in sync
+  if(running && (srcKind==='voice'||srcKind==='mixed'||srcKind==='mic')) restart();
 });
 document.getElementById('depth').addEventListener('input', e=>{
   jewel.depthDb = -Math.abs(parseFloat(e.target.value));
@@ -436,9 +462,9 @@ function drawSpectrum(){
 
 /* ════════════════ ruby monitor ════════════════ */
 function startRuby(){
-  clearInterval(rubyTimer); lastWall=performance.now(); jitterAcc=[];
+  clearInterval(rubyTimer); rubyActive=true; lastWall=performance.now(); jitterAcc=[];
   rubyTimer=setInterval(()=>{
-    if(!running||!ctx) return;
+    if(!rubyActive||!ctx) return;
     const elapsed=ctx.currentTime-t0;
     const r=rubyVerify(elapsed,16.6);
     document.getElementById('rubyElapsed').textContent=elapsed.toFixed(1)+'s';
@@ -457,6 +483,122 @@ function startRuby(){
         measured_scheduler_jitter_ms:+avg.toFixed(2),
         buffer_frames:4096}, null, 2);
   },250);
+}
+
+/* ════════════════ conversation test ════════════════ */
+const SCRIPT=[
+  {s:'MAN',   t:"Hey — are you still at the office?"},
+  {s:'WOMAN', t:"Just packing up. Why, what's on your mind?"},
+  {s:'MAN',   t:"I was thinking we finally try that little Italian place on Fifth. Tonight, if you're up for it."},
+  {s:'WOMAN', t:"Tonight works. What time were you thinking?"},
+  {s:'MAN',   t:"Seven thirty? I'll book a table and pick you up at seven."},
+  {s:'WOMAN', t:"Perfect. I'll wear the blue dress — the one you like."},
+  {s:'MAN',   t:"Deal. And no checking work email at the table this time."},
+  {s:'WOMAN', t:"No promises. See you at seven, love."},
+];
+let convMode=null, convIdx=-1, convTimer=null;
+
+function renderScript(active){
+  active = (active===undefined)?-1:active;
+  document.getElementById('scriptBox').innerHTML = SCRIPT.map((l,i)=>
+    '<div style="padding:5px 8px;border-radius:5px;margin-bottom:2px;'+
+    (i===active?'background:rgba(167,139,250,.20);border-left:3px solid #a78bfa;':'border-left:3px solid transparent;')+'">'+
+    '<b style="color:'+(l.s==='MAN'?'#8ecae6':'#f9a8d4')+'">'+l.s+':</b> '+l.t+'</div>'
+  ).join('');
+}
+renderScript();
+
+function loadVoices(){
+  if(!('speechSynthesis' in window)) return;
+  const vs=speechSynthesis.getVoices(); if(!vs.length) return;
+  const en=vs.filter(v=>/^en/i.test(v.lang||'')); const pool=en.length?en:vs;
+  const isMale=n=>/male/i.test(n)&&!/female/i.test(n);
+  const fill=(id,wantMale,fbIdx)=>{
+    const sel=document.getElementById(id); sel.innerHTML='';
+    pool.forEach(v=>{const o=document.createElement('option');o.value=v.name;
+      o.textContent=v.name+' ('+(v.lang||'?')+')';sel.appendChild(o);});
+    const pick=pool.find(v=>wantMale?isMale(v.name):/female/i.test(v.name))||pool[fbIdx%pool.length];
+    if(pick) sel.value=pick.name;
+  };
+  fill('manVoice',true,0); fill('womanVoice',false,1);
+}
+if('speechSynthesis' in window){ loadVoices(); speechSynthesis.onvoiceschanged=loadVoices; }
+else { document.getElementById('manVoice').innerHTML='<option>No speech engine</option>';
+       document.getElementById('womanVoice').innerHTML='<option>No speech engine</option>'; }
+
+function convButtons(running){
+  document.getElementById('convListen').disabled=running;
+  document.getElementById('convMic').disabled=running;
+  document.getElementById('convStop').disabled=!running;
+}
+function stopConversation(){
+  clearTimeout(convTimer);
+  if('speechSynthesis' in window) speechSynthesis.cancel();
+  if(convMode==='mic') stopAll();
+  convMode=null; convIdx=-1; renderScript();
+  document.getElementById('convNext').disabled=true;
+  convButtons(false);
+  clearInterval(rubyTimer); rubyActive=false;
+  document.getElementById('convNote').textContent='Stopped.';
+}
+function startRubyFree(){
+  // ruby monitor on a free-running clock (for TTS mode, no audio graph needed)
+  if(!ctx){ ctx=new (window.AudioContext||window.webkitAudioContext)(); }
+  if(ctx.state==='suspended') ctx.resume();
+  t0=ctx.currentTime; startRuby();
+}
+function speakNext(){
+  if(convMode!=='listen'||convIdx>=SCRIPT.length){ stopConversation(); return; }
+  const l=SCRIPT[convIdx]; renderScript(convIdx);
+  document.getElementById('convNote').textContent=
+    'Speaking '+(convIdx+1)+'/'+SCRIPT.length+' — '+l.s+
+    (document.getElementById('phoneLine').checked&&l.s==='WOMAN'?' (imagine her on the telephone line — Silver Voice 300–3400 Hz)':'');
+  const u=new SpeechSynthesisUtterance(l.t);
+  const sel=document.getElementById(l.s==='MAN'?'manVoice':'womanVoice');
+  const v=speechSynthesis.getVoices().find(x=>x.name===sel.value);
+  if(v) u.voice=v;
+  u.pitch=l.s==='MAN'?0.85:1.15; u.rate=1;
+  const adv=()=>{ convIdx++; convTimer=setTimeout(speakNext,500); };
+  u.onend=adv; u.onerror=adv;
+  speechSynthesis.speak(u);
+}
+document.getElementById('convListen').addEventListener('click',()=>{
+  stopConversation();
+  if(!('speechSynthesis' in window)){ document.getElementById('convNote').textContent='This browser has no speech engine.'; return; }
+  convMode='listen'; convIdx=0; convButtons(true); startRubyFree(); speakNext();
+});
+document.getElementById('convMic').addEventListener('click', async ()=>{
+  stopConversation();
+  convMode='mic'; convIdx=0; renderScript(0); convButtons(true);
+  document.getElementById('convNext').disabled=false;
+  await startSource('mic'); // mic → voice chain → full jewel processing; ruby monitor runs
+  if(!running){ stopConversation(); return; } // mic refused
+  document.getElementById('convNote').textContent=
+    'Mic live through the jewel chain. Read the highlighted line aloud, then NEXT LINE ▸. '+
+    'Flip the Amethyst / Silver Voice switches mid-read to hear the difference.';
+});
+document.getElementById('convNext').addEventListener('click',()=>{
+  if(convMode!=='mic') return;
+  convIdx=(convIdx+1)%SCRIPT.length; renderScript(convIdx);
+  document.getElementById('convNote').textContent='Line '+(convIdx+1)+'/'+SCRIPT.length+' — '+SCRIPT[convIdx].s+', read it aloud.';
+});
+document.getElementById('convStop').addEventListener('click', stopConversation);
+document.getElementById('phoneLine').addEventListener('change', e=>{
+  const on=e.target.checked;
+  setSilver(on, 'RU'); // engage/disengage the Silver Voice jewel in sync with its panel switch
+  document.getElementById('convNote').textContent = on
+    ? 'Telephone line engaged: mic now runs through the Silver Voice 300–3400 Hz band.'
+    : 'Telephone line off: mic back to the jewel panel settings.';
+  if(running && srcKind==='mic') restart();
+});
+// keep the jewel-panel Silver Voice switch in sync when toggled from the panel
+function setSilver(on, profile){
+  jewel.silver=on; if(profile) jewel.telecom=profile;
+  const sw=document.getElementById('swSilver');
+  sw.classList.toggle('on', on);
+  document.getElementById('swSilLabel').textContent=on?'ENGAGED':'BYPASSED';
+  const prof=document.getElementById('telecomProfile');
+  if(profile) prof.value=profile;
 }
 
 /* ════════════════ manifest compiler ════════════════ */
