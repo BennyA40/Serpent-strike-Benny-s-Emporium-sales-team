@@ -1,0 +1,535 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>YAMATO — Sound System Test Harness</title>
+<style>
+  :root{ --bg:#08080c; --panel:#101016; --panel2:#161620; --line:#242434;
+         --gold:#f59e0b; --amethyst:#a78bfa; --silver:#cbd5e1; --ruby:#fb7185;
+         --txt:#f1f5f9; --dim:#8e9aaf; --mono:ui-monospace,SFMono-Regular,Menlo,monospace; }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--txt);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding-bottom:48px}
+  header{border-bottom:1px solid var(--line);background:rgba(16,16,22,.97);padding:18px 20px;position:sticky;top:0;z-index:5}
+  header h1{margin:0;font-family:Georgia,serif;font-size:22px;letter-spacing:3px;color:var(--amethyst)}
+  header p{margin:6px 0 0;font-size:11px;letter-spacing:2px;color:var(--dim)}
+  .chip{display:inline-block;font-size:11px;font-family:var(--mono);border:1px solid var(--line);border-radius:20px;padding:4px 12px;margin:10px 8px 0 0;color:var(--dim)}
+  .chip.ok{border-color:var(--amethyst);color:var(--amethyst)}
+  .wrap{max-width:1100px;margin:0 auto;padding:20px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;align-items:start}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:12px}
+  .panel h2{font-family:Georgia,serif;font-size:13px;letter-spacing:2px;margin:0}
+  .gold{color:var(--gold)} .am{color:var(--amethyst)} .sil{color:var(--silver)} .rb{color:var(--ruby)}
+  label.lab{font-size:11px;letter-spacing:1px;color:var(--dim);text-transform:uppercase;display:block;margin-bottom:6px}
+  input[type=text],input[type=number],textarea,select{background:#0b0b10;border:1px solid var(--line);color:var(--txt);border-radius:6px;padding:10px 12px;font-size:13px;width:100%}
+  input[type=range]{width:100%;accent-color:var(--amethyst)}
+  button{border:1px solid #2f3a55;background:#1c2333;color:#dbe4f3;border-radius:8px;padding:10px 16px;font-size:13px;cursor:pointer;font-weight:600}
+  button:active{transform:translateY(1px)}
+  button.primary{background:rgba(167,139,250,.15);border-color:var(--amethyst);color:var(--amethyst);letter-spacing:1px}
+  button.warn{border-color:var(--ruby);color:var(--ruby);background:rgba(251,113,133,.08)}
+  button:disabled{opacity:.4;cursor:default}
+  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .mono{font-family:var(--mono);font-size:12px}
+  .term{background:#0b0b10;border:1px solid var(--line);border-radius:8px;padding:12px;font-family:var(--mono);font-size:11.5px;overflow:auto;white-space:pre-wrap;color:#c4b5fd;max-height:280px}
+  .jewel{border-left:3px solid var(--amethyst)}
+  .jewel.ruby{border-left-color:var(--ruby)} .jewel.silver{border-left-color:var(--silver)}
+  .sw{display:inline-flex;align-items:center;gap:8px;cursor:pointer;user-select:none}
+  .sw .tk{width:42px;height:24px;border-radius:14px;background:#2a2f3a;position:relative;transition:background .15s}
+  .sw .tk::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#8e9aaf;transition:left .15s,background .15s}
+  .sw.on .tk{background:rgba(167,139,250,.4)}
+  .sw.on .tk::after{left:21px;background:var(--amethyst)}
+  canvas#spec{width:100%;height:220px;background:#0b0b10;border:1px solid var(--line);border-radius:8px}
+  .legend{display:flex;gap:16px;font-size:11px;color:var(--dim);font-family:var(--mono)}
+  .dot{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px}
+  table.nodes{width:100%;border-collapse:collapse;font-size:12px;font-family:var(--mono)}
+  table.nodes th{text-align:left;color:var(--dim);font-weight:600;padding:6px;border-bottom:1px solid var(--line)}
+  table.nodes td{padding:6px;border-bottom:1px solid #1b1b26;color:var(--txt)}
+  .note{font-size:11.5px;color:var(--dim);line-height:1.5}
+  .big{font-size:26px;font-family:var(--mono);font-weight:700}
+  .lock{color:#34d399}.correct{color:var(--ruby)}
+  footer{text-align:center;margin-top:28px;font-size:11px;color:#4b5568;letter-spacing:1px}
+  a{color:var(--gold);text-decoration:none}
+</style>
+</head>
+<body>
+<header>
+  <h1>◆ YAMATO</h1>
+  <p>SOUND SYSTEM TEST HARNESS · REVERSE-FUNNEL AUDIO ENGINE v1.0-SOVEREIGN</p>
+  <span class="chip" id="parityChip">MATH PARITY: checking…</span>
+  <span class="chip">ENGINE REF: yamato_engine.py · sr 48000</span>
+</header>
+
+<div class="wrap">
+  <p class="note" style="margin:4px 0 18px;font-style:italic">
+    A browser-local test bench for the three Framing Jewels. The DSP math below is the engine's own —
+    Amethyst IIR coefficients computed with the verbatim formula from <span class="mono">yamato_engine.py</span>
+    (self-test on load compares against the engine's reference output). No server, no fake URLs: press the
+    jewel switches and hear the actual carve. Mic input needs the live https page.
+  </p>
+
+  <!-- TEST SIGNAL -->
+  <div class="panel" style="margin-bottom:16px">
+    <h2 class="gold">▼ TEST SIGNAL</h2>
+    <div class="row">
+      <button data-src="surf" class="primary">WIND SURF <span class="note">· colossus ambient</span></button>
+      <button data-src="voice">VOICE <span class="note">· kitsune vocal</span></button>
+      <button data-src="mixed" class="primary">MIXED SCENE <span class="note">· surf + voice</span></button>
+      <button data-src="mic">MIC</button>
+      <button data-src="file">AUDIO FILE…</button>
+      <input type="file" id="fileIn" accept="audio/*" style="display:none"/>
+      <button id="stopBtn" class="warn" disabled>■ STOP</button>
+    </div>
+    <div><label class="lab">Monitor gain</label><input type="range" id="gain" min="0" max="100" value="70"></div>
+    <div class="note" id="srcNote">Idle. Choose a source to start the graph — your tap also unlocks the AudioContext.</div>
+  </div>
+
+  <!-- JEWELS -->
+  <div class="grid" style="margin-bottom:16px">
+    <div class="panel jewel">
+      <h2 class="am">◆ 1 · AMETHYST — SPECTRAL CARVE</h2>
+      <div class="sw on" id="swAmethyst"><span class="tk"></span><span class="mono" id="swAmLabel">ENGAGED</span></div>
+      <div><label class="lab">Ducking depth — <span id="depthVal">9</span> dB (spec −6…−12)</label>
+        <input type="range" id="depth" min="6" max="12" value="9" step="0.5"></div>
+      <div class="note">2nd-order IIR notch @ <b class="am">2500 Hz</b>, 1000 Hz bandwidth, attack 15ms / release 250ms.
+        Carves the vocal formant band out of the ambient bed so surf can't swallow speech. Coefficients recomputed live:</div>
+      <div class="term" id="amethystCoefs" style="max-height:120px">—</div>
+    </div>
+
+    <div class="panel jewel silver">
+      <h2 class="sil">◆ 2 · SILVER VOICE — TELECOM PROFILE</h2>
+      <div class="sw on" id="swSilver"><span class="tk"></span><span class="mono" id="swSilLabel">ENGAGED</span></div>
+      <div><label class="lab">Profile</label>
+        <select id="telecomProfile">
+          <option value="RU">RUSSIAN_PHONE_RECEIVER_300_3400HZ</option>
+          <option value="FULL">FULL_SPECTRUM_DIRECT</option>
+        </select></div>
+      <div class="note">Brickwall anti-alias @ <b class="sil">20 kHz</b> + 4th-order Butterworth telecom bandpass
+        <b class="sil">300–3400 Hz</b> with 2nd-order non-linear tube warmth on the vocal line.
+        Hear the voice go telephone-line.</div>
+      <div class="term" id="silverDesc" style="max-height:120px">—</div>
+    </div>
+
+    <div class="panel jewel ruby">
+      <h2 class="rb">◆ 3 · RUBY — PHASE LOCK</h2>
+      <div class="row">
+        <div style="flex:1"><label class="lab">Elapsed</label><div class="big" id="rubyElapsed">0.0s</div></div>
+        <div style="flex:1"><label class="lab">Drift</label><div class="big" id="rubyDrift">—</div></div>
+        <div style="flex:1"><label class="lab">Status</label><div class="big lock" id="rubyStatus">—</div></div>
+      </div>
+      <div class="note">Tolerance <b class="rb">16.6 ms</b> (1 frame @ 60fps) · buffer <b class="rb">4096</b> frames ·
+        extended memory <span class="mono">PERSISTENT_IMPULSE_RESPONSE_ACTIVE</span>.<br>
+        Drift shown is the engine's own <span class="mono">verify_temporal_lock(elapsed)</span>; jitter is measured
+        scheduler drift between the audio clock and the wall clock.</div>
+      <div class="term" id="rubyTerm" style="max-height:120px">—</div>
+    </div>
+  </div>
+
+  <!-- SPECTRUM -->
+  <div class="panel" style="margin-bottom:16px">
+    <div class="row" style="justify-content:space-between">
+      <h2 class="gold">SPECTRUM — POST-JEWEL</h2>
+      <div class="legend">
+        <span><span class="dot" style="background:#a78bfa"></span>ambient (amethyst carve)</span>
+        <span><span class="dot" style="background:#cbd5e1"></span>voice (silver voice)</span>
+      </div>
+    </div>
+    <canvas id="spec" width="900" height="220"></canvas>
+    <div class="note">Marker lines: 300 / 2500 / 3400 Hz and the 20 kHz brickwall. Toggle a jewel and watch the band move in real time.</div>
+  </div>
+
+  <!-- MANIFEST -->
+  <div class="panel" style="margin-bottom:16px">
+    <h2 class="am">📜 .YAMATO MANIFEST COMPILER</h2>
+    <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(180px,1fr))">
+      <div><label class="lab">Intent seed</label><input type="text" id="mIntent" value="mountain_vigil"></div>
+      <div><label class="lab">Location</label><input type="text" id="mLoc" value="Mountain Peak"></div>
+      <div><label class="lab">Time of day</label><input type="text" id="mTime" value="Golden Hour"></div>
+      <div><label class="lab">Climate</label><input type="text" id="mClim" value="Breeze"></div>
+      <div><label class="lab">Duration (s)</label><input type="number" id="mDur" value="60" min="1" max="3600"></div>
+    </div>
+    <div><label class="lab">Nodes (id · type · x,y,z · priority · filter)</label>
+      <table class="nodes" id="nodeTable">
+        <tr><th>node_id</th><th>node_type</th><th>xyz</th><th>prio</th><th>filter_override</th><th></th></tr>
+      </table>
+      <div class="row" style="margin-top:8px">
+        <input type="text" id="nId" placeholder="node id" style="max-width:130px">
+        <select id="nType" style="max-width:170px"><option>kitsune_vocal</option><option>colossus_ambient</option><option>silver_voice_telecom</option></select>
+        <input type="text" id="nXyz" placeholder="0, 1.5, 1.0" style="max-width:110px">
+        <input type="number" id="nPrio" placeholder="prio" style="max-width:70px" value="0">
+        <button id="addNode">+ node</button>
+      </div>
+    </div>
+    <div class="row">
+      <button id="compileBtn" class="primary">◆ COMPILE MANIFEST</button>
+      <button id="dlBtn" disabled>Download .yamato.json</button>
+    </div>
+    <div class="term" id="manifestOut">No manifest compiled yet.</div>
+    <div class="note">Browser-local draft using the exact schema of <span class="mono">POST /yamato/compile</span>
+      — same jewels, same coefficients, same ruby verification. Swap it for the Forge endpoint when the backend is live.</div>
+  </div>
+
+  <footer>SOVEREIGN AI CREATIVE STUDIO · YAMATO TEST HARNESS · test build — not the studio page</footer>
+</div>
+
+<script>
+'use strict';
+/* ══════════════════════════════════════════════════════════════════
+   YAMATO TEST HARNESS — DSP core ported verbatim from
+   covenant-forge-66/backend/services/yamato_engine.py (v1.0-SOVEREIGN)
+   ══════════════════════════════════════════════════════════════════ */
+
+// Engine reference values (baked from yamato_engine.py via the venv python):
+const ENGINE_REF = {
+  coefs: { b0:0.9984791122526342, b1:-1.889395893463934, b2:0.996806320761671,
+           a1:-1.889395893463934, a2:0.995285433014305 },
+  ruby60: { drift_ms:7.6, status:'LOCKED' }
+};
+
+// --- AmethystCarver.calculate_notch_coefficients (verbatim port) ---
+function amethystCoefficients(duckingDb, centerHz, bwHz, sampleRate){
+  const w0 = 2*Math.PI*centerHz/sampleRate;
+  const bw = bwHz/sampleRate;
+  const alpha = Math.sin(w0)*Math.sinh(Math.LN2/2*bw*w0/Math.sin(w0));
+  const g = Math.pow(10, duckingDb/20);
+  const b0=1+alpha*g, b1=-2*Math.cos(w0), b2=1-alpha*g;
+  const a0=1+alpha, a1=-2*Math.cos(w0), a2=1-alpha;
+  return { b0:b0/a0, b1:b1/a0, b2:b2/a0, a1:a1/a0, a2:a2/a0,
+           ducking_db:duckingDb, center_hz:centerHz };
+}
+// --- RubyPhaseLockBuffer.verify_temporal_lock (verbatim port) ---
+function rubyVerify(elapsedSec, tolMs){
+  tolMs = tolMs || 16.6;
+  const drift = (elapsedSec*1000) % tolMs;
+  return { elapsed_seconds:elapsedSec, drift_ms:Math.round(drift*1000)/1000,
+           max_allowed_drift_ms:tolMs,
+           phase_lock_status: drift < tolMs ? 'LOCKED' : 'CORRECTING',
+           extended_memory_state:'PERSISTENT_IMPULSE_RESPONSE_ACTIVE' };
+}
+// --- SilverVoiceProcessor.apply_telecom_profile (verbatim port) ---
+function silverVoiceProfile(name){
+  if(name==='RUSSIAN_PHONE_RECEIVER_300_3400HZ') return {
+    profile:name, type:'Butterworth Bandpass (2nd Order)',
+    low_cutoff_hz:300, high_cutoff_hz:3400,
+    saturation_harmonic:'2nd-Order Non-Linear Tube Warmth',
+    anti_aliasing:'ACTIVE (Brickwall @ 20kHz)' };
+  return { profile:'FULL_SPECTRUM_DIRECT' };
+}
+
+// --- self-test: JS math vs the engine's own reference output ---
+(function parity(){
+  const c = amethystCoefficients(-9, 2500, 1000, 48000);
+  let dmax = 0;
+  for(const k of ['b0','b1','b2','a1','a2']) dmax = Math.max(dmax, Math.abs(c[k]-ENGINE_REF.coefs[k]));
+  const r = rubyVerify(60, 16.6);
+  const rOk = Math.abs(r.drift_ms-ENGINE_REF.ruby60.drift_ms)<1e-9 && r.phase_lock_status===ENGINE_REF.ruby60.status;
+  const ok = dmax < 1e-9 && rOk;
+  const chip = document.getElementById('parityChip');
+  chip.textContent = ok ? ('MATH PARITY: PASS (Δmax '+dmax.toExponential(1)+')') : 'MATH PARITY: FAIL';
+  chip.classList.toggle('ok', ok);
+})();
+
+/* ════════════════ audio graph ════════════════ */
+let ctx=null, master=null, masterAn=null, ambAn=null, voxAn=null;
+let sources=[], nodes=[], running=false, t0=0, srcKind=null;
+let jewel={ amethyst:true, silver:true, depthDb:-9, telecom:'RU' };
+let rubyTimer=null, lastWall=0, jitterAcc=[];
+
+function makeSurfBuffer(){
+  const len = ctx.sampleRate*4, buf = ctx.createBuffer(1,len,ctx.sampleRate), d = buf.getChannelData(0);
+  let b0=0,b1=0,b2=0;
+  for(let i=0;i<len;i++){ const w=Math.random()*2-1;
+    b0=0.997*b0+w*0.03; b1=0.985*b1+w*0.03; b2=0.95*b2+w*0.03;
+    d[i]=(b0+b1+b2+w*0.05)*0.5; }
+  return buf;
+}
+function makeVoiceChain(){
+  // vocal-fold sawtooth + formant emphasis at the Amethyst center
+  const osc = ctx.createOscillator(); osc.type='sawtooth'; osc.frequency.value=130.81;
+  const osc2 = ctx.createOscillator(); osc2.type='triangle'; osc2.frequency.value=261.62;
+  const vib = ctx.createOscillator(); vib.frequency.value=5.2;
+  const vibG = ctx.createGain(); vibG.gain.value=6; vib.connect(vibG); vibG.connect(osc.frequency);
+  const formant = ctx.createBiquadFilter(); formant.type='bandpass'; formant.frequency.value=2500; formant.Q.value=1.1;
+  const mix = ctx.createGain(); mix.gain.value=0.5;
+  osc.connect(formant); osc2.connect(formant); formant.connect(mix);
+  return { outs:[mix], start:()=>{osc.start();osc2.start();vib.start();}, stop:()=>{try{osc.stop();osc2.stop();vib.stop();}catch(e){}} };
+}
+function silverVoiceNodes(){
+  // brickwall 20k + telecom chain (2×HP300 → 2×LP3400) + tube warmth
+  const wall = ctx.createBiquadFilter(); wall.type='lowpass'; wall.frequency.value=20000; wall.Q.value=0.5;
+  if(jewel.silver && jewel.telecom==='FULL') return { head:wall, tail:wall, desc:'brickwall @20kHz only' };
+  if(!jewel.silver) return { head:null, tail:null, desc:'bypassed' };
+  const hp1=ctx.createBiquadFilter(), hp2=ctx.createBiquadFilter();
+  hp1.type=hp2.type='highpass'; hp1.frequency.value=hp2.frequency.value=300; hp1.Q.value=hp2.Q.value=0.7071;
+  const lp1=ctx.createBiquadFilter(), lp2=ctx.createBiquadFilter();
+  lp1.type=lp2.type='lowpass'; lp1.frequency.value=lp2.frequency.value=3400; lp1.Q.value=lp2.Q.value=0.7071;
+  const shaper=ctx.createWaveShaper();
+  const curve=new Float32Array(256);
+  for(let i=0;i<256;i++){ const x=i/128-1; curve[i]=Math.tanh(1.6*x); }
+  shaper.curve=curve;
+  hp1.connect(hp2); hp2.connect(lp1); lp1.connect(lp2); lp2.connect(shaper); shaper.connect(wall);
+  return { head:hp1, tail:wall, desc:'brickwall @20kHz + Butterworth 300–3400Hz + tube warmth' };
+}
+function amethystNode(){
+  const sr = ctx.sampleRate;
+  const c = amethystCoefficients(jewel.amethyst ? jewel.depthDb : 0, 2500, 1000, sr);
+  const f = ctx.createIIRFilter([c.b0,c.b1,c.b2],[1,c.a1,c.a2]);
+  return { node:f, coefs:c };
+}
+function renderAmethystTerm(c){
+  document.getElementById('amethystCoefs').textContent =
+    'b0 '+c.b0.toFixed(9)+'\nb1 '+c.b1.toFixed(9)+'\nb2 '+c.b2.toFixed(9)+
+    '\na1 '+c.a1.toFixed(9)+'\na2 '+c.a2.toFixed(9)+
+    '\n— depth '+c.ducking_db+' dB @ '+c.center_hz+' Hz · sr '+ctx.sampleRate+' Hz';
+}
+
+async function startSource(kind){
+  stopAll();
+  ctx = ctx || new (window.AudioContext||window.webkitAudioContext)();
+  if(ctx.state==='suspended') await ctx.resume();
+  master = ctx.createGain(); master.gain.value = document.getElementById('gain').value/100*0.9;
+  masterAn = ctx.createAnalyser(); masterAn.fftSize=2048; masterAn.smoothingTimeConstant=0.8;
+  ambAn = ctx.createAnalyser(); ambAn.fftSize=2048; ambAn.smoothingTimeConstant=0.8;
+  voxAn = ctx.createAnalyser(); voxAn.fftSize=2048; voxAn.smoothingTimeConstant=0.8;
+  master.connect(masterAn); masterAn.connect(ctx.destination);
+  srcKind = kind; t0 = ctx.currentTime; running = true;
+
+  const surfBuf = makeSurfBuffer();
+
+  function ambientEntry(){
+    // colossus_ambient → amethyst carve
+    const carve = amethystNode(); renderAmethystTerm(carve.coefs);
+    const g = ctx.createGain(); g.gain.value = 0.9;
+    carve.node.connect(g); g.connect(ambAn); ambAn.connect(master);
+    return carve.node;
+  }
+  function voiceEntry(){
+    // kitsune_vocal → silver voice isolation
+    const sv = silverVoiceNodes();
+    const g = ctx.createGain(); g.gain.value = 0.9;
+    let head, tail;
+    if(sv.head){ sv.tail.connect(g); head=sv.head; }
+    else { head=g; }
+    g.connect(voxAn); voxAn.connect(master);
+    document.getElementById('silverDesc').textContent =
+      silverVoiceProfile(jewel.telecom==='RU'?'RUSSIAN_PHONE_RECEIVER_300_3400HZ':'FULL_SPECTRUM_DIRECT').profile
+      + '\n' + sv.desc + (jewel.silver ? '' : '\n(jewel disengaged — direct)');
+    return head;
+  }
+
+  if(kind==='surf' || kind==='mixed'){
+    const s = ctx.createBufferSource(); s.buffer=surfBuf; s.loop=true;
+    s.connect(ambientEntry()); s.start(); sources.push(s);
+  }
+  if(kind==='voice' || kind==='mixed'){
+    const v = makeVoiceChain(); v.outs[0].connect(voiceEntry()); v.start(); sources.push(v);
+  }
+  if(kind==='mic'){
+    try{
+      const stream = await navigator.mediaDevices.getUserMedia({audio:true});
+      const ms = ctx.createMediaStreamSource(stream);
+      ms.connect(voiceEntry()); sources.push({stop:()=>stream.getTracks().forEach(t=>t.stop())});
+    }catch(e){ document.getElementById('srcNote').textContent = 'Mic refused: '+e.message+' (needs https — use the live page).'; running=false; return; }
+  }
+  if(kind==='file'){
+    document.getElementById('fileIn').click(); running=false; return;
+  }
+  document.getElementById('srcNote').textContent =
+    'Running: '+kind+' · amethyst '+(jewel.amethyst?'ON ('+jewel.depthDb+' dB)':'OFF')
+    +' · silver voice '+(jewel.silver?'ON':'OFF')+' · sr '+ctx.sampleRate+' Hz';
+  document.getElementById('stopBtn').disabled = false;
+  drawSpectrum(); startRuby();
+}
+let lastFile=null;
+async function playFileBuffer(buf, name){
+  stopAll();
+  ctx = ctx || new (window.AudioContext||window.webkitAudioContext)();
+  if(ctx.state==='suspended') await ctx.resume();
+  master = ctx.createGain(); master.gain.value = document.getElementById('gain').value/100*0.9;
+  masterAn = ctx.createAnalyser(); masterAn.fftSize=2048;
+  ambAn = ctx.createAnalyser(); ambAn.fftSize=2048; ambAn.smoothingTimeConstant=0.8;
+  voxAn = ctx.createAnalyser(); voxAn.fftSize=2048; voxAn.smoothingTimeConstant=0.8;
+  master.connect(masterAn); masterAn.connect(ctx.destination);
+  const carve = amethystNode(); renderAmethystTerm(carve.coefs);
+  const s = ctx.createBufferSource(); s.buffer=buf; s.loop=true;
+  s.connect(carve.node); carve.node.connect(ambAn); ambAn.connect(master);
+  s.start(); sources.push(s); t0=ctx.currentTime; running=true; srcKind='file';
+  document.getElementById('srcNote').textContent = 'Running: file "'+name+'" → amethyst carve chain.';
+  document.getElementById('stopBtn').disabled=false;
+  drawSpectrum(); startRuby();
+}
+document.getElementById('fileIn').addEventListener('change', async e=>{
+  const f = e.target.files[0]; if(!f) return;
+  ctx = ctx || new (window.AudioContext||window.webkitAudioContext)();
+  if(ctx.state==='suspended') await ctx.resume();
+  const buf = await ctx.decodeAudioData(await f.arrayBuffer());
+  lastFile = { buf, name:f.name };
+  playFileBuffer(buf, f.name);
+  e.target.value='';
+});
+function stopAll(){
+  sources.forEach(s=>{ try{s.stop()}catch(e){} try{s.disconnect()}catch(e){} });
+  sources=[]; nodes=[];
+  if(master){ try{master.disconnect()}catch(e){} }
+  running=false; clearInterval(rubyTimer);
+  document.getElementById('stopBtn').disabled=true;
+  document.getElementById('rubyStatus').textContent='—';
+  document.getElementById('srcNote').textContent='Idle.';
+}
+document.getElementById('stopBtn').addEventListener('click', stopAll);
+document.querySelectorAll('[data-src]').forEach(b=>b.addEventListener('click',()=>startSource(b.dataset.src)));
+document.getElementById('gain').addEventListener('input',e=>{ if(master) master.gain.value=e.target.value/100*0.9; });
+
+// jewel toggles — rebuild the live chain so the carve is audible instantly
+function bindSwitch(id, fn){
+  const el = document.getElementById(id);
+  el.addEventListener('click', ()=>{ el.classList.toggle('on'); fn(el.classList.contains('on')); });
+}
+bindSwitch('swAmethyst', on=>{
+  jewel.amethyst=on; document.getElementById('swAmLabel').textContent=on?'ENGAGED':'BYPASSED';
+  if(running && (srcKind==='surf'||srcKind==='mixed'||srcKind==='file')) restart();
+});
+bindSwitch('swSilver', on=>{
+  jewel.silver=on; document.getElementById('swSilLabel').textContent=on?'ENGAGED':'BYPASSED';
+  if(running && (srcKind==='voice'||srcKind==='mixed')) restart();
+});
+document.getElementById('depth').addEventListener('input', e=>{
+  jewel.depthDb = -Math.abs(parseFloat(e.target.value));
+  document.getElementById('depthVal').textContent = Math.abs(jewel.depthDb);
+  if(jewel.amethyst && running && (srcKind==='surf'||srcKind==='mixed'||srcKind==='file')) restart();
+});
+document.getElementById('telecomProfile').addEventListener('change', e=>{
+  jewel.telecom = e.target.value;
+  if(running && (srcKind==='voice'||srcKind==='mixed')) restart();
+});
+function restart(){
+  const k=srcKind;
+  if(k==='file' && lastFile){ playFileBuffer(lastFile.buf, lastFile.name); return; }
+  stopAll(); startSource(k);
+}
+
+/* ════════════════ spectrum ════════════════ */
+const canvas=document.getElementById('spec'), cx2d=canvas.getContext('2d');
+const MARKS=[[300,'#cbd5e1','300'],[2500,'#a78bfa','2.5k'],[3400,'#cbd5e1','3.4k'],[20000,'#f59e0b','20k']];
+function freqX(f,w){ const min=Math.log10(40), max=Math.log10(22000); return (Math.log10(Math.max(f,40))-min)/(max-min)*w; }
+function drawSpectrum(){
+  if(!running) return;
+  requestAnimationFrame(drawSpectrum);
+  const w=canvas.width,h=canvas.height;
+  cx2d.fillStyle='#0b0b10'; cx2d.fillRect(0,0,w,h);
+  cx2d.strokeStyle='#242434'; cx2d.fillStyle='#8e9aaf'; cx2d.font='10px monospace';
+  for(const [f,col,lab] of MARKS){
+    const x=freqX(f,w);
+    cx2d.strokeStyle=col+'55'; cx2d.beginPath(); cx2d.moveTo(x,0); cx2d.lineTo(x,h); cx2d.stroke();
+    cx2d.fillStyle=col; cx2d.fillText(lab,x+3,12);
+  }
+  const plot=(an,color)=>{
+    const n=an.frequencyBinCount, data=new Uint8Array(n); an.getByteFrequencyData(data);
+    cx2d.strokeStyle=color; cx2d.lineWidth=1.6; cx2d.beginPath();
+    for(let i=0;i<n;i++){
+      const f=i/n*(ctx.sampleRate/2), x=freqX(f,w), y=h-(data[i]/255)*h;
+      i?cx2d.lineTo(x,y):cx2d.moveTo(x,y);
+    }
+    cx2d.stroke();
+  };
+  plot(ambAn,'#a78bfa'); plot(voxAn,'#cbd5e1');
+}
+
+/* ════════════════ ruby monitor ════════════════ */
+function startRuby(){
+  clearInterval(rubyTimer); lastWall=performance.now(); jitterAcc=[];
+  rubyTimer=setInterval(()=>{
+    if(!running||!ctx) return;
+    const elapsed=ctx.currentTime-t0;
+    const r=rubyVerify(elapsed,16.6);
+    document.getElementById('rubyElapsed').textContent=elapsed.toFixed(1)+'s';
+    const dEl=document.getElementById('rubyDrift');
+    dEl.textContent=r.drift_ms.toFixed(2)+' ms';
+    const st=document.getElementById('rubyStatus');
+    st.textContent=r.phase_lock_status;
+    st.className='big '+(r.phase_lock_status==='LOCKED'?'lock':'correct');
+    const now=performance.now(), jit=now-lastWall-250; lastWall=now;
+    jitterAcc.push(Math.abs(jit)); if(jitterAcc.length>20) jitterAcc.shift();
+    const avg=jitterAcc.reduce((a,b)=>a+b,0)/jitterAcc.length;
+    document.getElementById('rubyTerm').textContent=
+      JSON.stringify({elapsed_seconds:+elapsed.toFixed(2), drift_ms:r.drift_ms,
+        max_allowed_drift_ms:16.6, phase_lock_status:r.phase_lock_status,
+        extended_memory_state:r.extended_memory_state,
+        measured_scheduler_jitter_ms:+avg.toFixed(2),
+        buffer_frames:4096}, null, 2);
+  },250);
+}
+
+/* ════════════════ manifest compiler ════════════════ */
+let manifestNodes=[
+  {node_id:'vocal_local', node_type:'kitsune_vocal', spatial_coordinates:[0,1.5,1.0], amethyst_priority:3, language:'ru-RU', filter_override:null},
+  {node_id:'surf_bed', node_type:'colossus_ambient', spatial_coordinates:[-2,0.5,3.0], amethyst_priority:0, language:null, filter_override:null},
+  {node_id:'call_line', node_type:'silver_voice_telecom', spatial_coordinates:[1,1.2,0.5], amethyst_priority:1, language:'ru-RU', filter_override:'RUSSIAN_PHONE_RECEIVER_300_3400HZ'},
+];
+function drawNodes(){
+  const t=document.getElementById('nodeTable');
+  t.querySelectorAll('tr.nrow').forEach(r=>r.remove());
+  manifestNodes.forEach((n,i)=>{
+    const tr=document.createElement('tr'); tr.className='nrow';
+    tr.innerHTML='<td>'+n.node_id+'</td><td>'+n.node_type+'</td><td>['+n.spatial_coordinates.join(', ')+']</td><td>'+n.amethyst_priority+'</td><td>'+(n.filter_override||'—')+'</td>';
+    const td=document.createElement('td'), b=document.createElement('button');
+    b.textContent='✕'; b.style.padding='2px 8px';
+    b.onclick=()=>{manifestNodes.splice(i,1);drawNodes();};
+    td.appendChild(b); tr.appendChild(td); t.appendChild(tr);
+  });
+}
+drawNodes();
+document.getElementById('addNode').addEventListener('click',()=>{
+  const id=document.getElementById('nId').value.trim(); if(!id) return;
+  const xyz=(document.getElementById('nXyz').value||'0,0,0').split(',').map(s=>parseFloat(s)||0);
+  manifestNodes.push({node_id:id, node_type:document.getElementById('nType').value,
+    spatial_coordinates:[xyz[0]||0,xyz[1]||0,xyz[2]||0],
+    amethyst_priority:parseInt(document.getElementById('nPrio').value)||0,
+    language:null, filter_override:null});
+  document.getElementById('nId').value=''; drawNodes();
+});
+let lastManifest=null;
+document.getElementById('compileBtn').addEventListener('click',()=>{
+  const dur=parseFloat(document.getElementById('mDur').value)||60;
+  const sr=48000;
+  const carve=amethystCoefficients(jewel.amethyst?jewel.depthDb:-0, 2500, 1000, sr);
+  const compiled=manifestNodes.map(n=>{
+    const d={...n};
+    if(n.filter_override) d.dsp_processing=silverVoiceProfile(n.filter_override);
+    else if(n.node_type==='kitsune_vocal') d.dsp_processing={
+      silver_voice:'HARMONIC_ISOLATION_ACTIVE',
+      amethyst_carve_trigger:'ACTIVE ('+jewel.depthDb+'dB notch @ 2500Hz)'};
+    else if(n.node_type==='colossus_ambient') d.dsp_processing={amethyst_applied_carve:carve};
+    return d;
+  });
+  lastManifest={
+    yamato_version:'1.0-SOVEREIGN (browser-local draft)',
+    synthesis_timestamp:new Date().toISOString().replace(/\.\d+Z$/,'Z'),
+    scene_bounds:{ location:document.getElementById('mLoc').value,
+      time_of_day:document.getElementById('mTime').value,
+      duration_seconds:dur, autonomous_mode:true,
+      intent_seed:document.getElementById('mIntent').value,
+      climate:document.getElementById('mClim').value },
+    framing_jewels:{
+      amethyst:{enabled:jewel.amethyst, ducking_depth_db:jewel.depthDb,
+        formant_center_hz:2500, formant_bandwidth_hz:1000, attack_ms:15, release_ms:250},
+      ruby:{enabled:true, max_drift_tolerance_ms:16.6,
+        extended_memory_active:true, phase_lock_buffer_size:4096},
+      silver_voice:{enabled:jewel.silver, anti_aliasing_cutoff_hz:20000,
+        telecom_filter_profile:jewel.telecom==='RU'?'RUSSIAN_PHONE_RECEIVER_300_3400HZ':'FULL_SPECTRUM_DIRECT',
+        telecom_passband_low_hz:300, telecom_passband_high_hz:3400}},
+    phase_and_temporal_lock:rubyVerify(dur,16.6),
+    compiled_audio_nodes:compiled
+  };
+  document.getElementById('manifestOut').textContent=JSON.stringify(lastManifest,null,2);
+  document.getElementById('dlBtn').disabled=false;
+});
+document.getElementById('dlBtn').addEventListener('click',()=>{
+  if(!lastManifest) return;
+  const blob=new Blob([JSON.stringify(lastManifest,null,2)],{type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download='yamato-manifest.yamato.json'; a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+});
+</script>
+</body>
+</html>
