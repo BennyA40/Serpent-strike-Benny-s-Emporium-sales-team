@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Book Catalog · Publishing Hub · Benny's Emporium</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="name">Benny's Emporium</span>
+    <span class="hub">Publishing Hub</span>
+  </div>
+  <nav class="nav">
+    <a href="#" class="active">Catalog</a>
+    <a class="soon" title="Coming next">Dashboard</a>
+    <a class="soon" title="Coming next">Blog</a>
+    <a class="soon" title="Coming next">Contact</a>
+  </nav>
+</header>
+
+<section class="hero">
+  <div>
+    <span class="sample-badge">Sample catalog data</span>
+    <h1>The Book Catalog</h1>
+    <p>Manga, comics, light novels, and artbooks from the Emporium's story forge — published across KDP, Barnes &amp; Noble Press, Lulu, IngramSpark, and Draft2Digital.</p>
+    <div class="searchbar">
+      <input id="search" type="text" placeholder="Search by title or author…" autocomplete="off" />
+      <button type="button" onclick="document.getElementById('search').focus()">Search</button>
+    </div>
+  </div>
+  <div class="hero-art">
+    <img src="assets/hero.webp" alt="Cozy bookstore corner illustration" />
+  </div>
+</section>
+
+<main class="catalog">
+  <div class="catalog-head">
+    <div>
+      <h2>Browse the shelves</h2>
+      <div class="count" id="count"></div>
+    </div>
+    <div class="controls">
+      <select id="sort" aria-label="Sort books">
+        <option value="featured">Sort: Featured</option>
+        <option value="rating">Sort: Top rated</option>
+        <option value="price-asc">Sort: Price low → high</option>
+        <option value="price-desc">Sort: Price high → low</option>
+      </select>
+    </div>
+  </div>
+  <div class="pills" id="pills"></div>
+  <div class="grid" id="grid"></div>
+</main>
+
+<section class="forge-banner">
+  <div class="forge-inner">
+    <div>
+      <h3>Written in Story Forge? <span class="jewel">◆</span> Publish it here.</h3>
+      <p>Finished manuscripts from the Story Forge flow straight into this catalog — cover, metadata, and distribution handled by the Publishing Hub. Your published books will appear on this shelf.</p>
+    </div>
+    <a class="cta" href="#" onclick="return false" title="Connects to Story Forge at launch">Connect Story Forge</a>
+  </div>
+</section>
+
+<footer>
+  <div class="foot-grid">
+    <div>
+      <h4>Benny's Emporium</h4>
+      <a href="#">About the press</a>
+      <a href="#">Submission guidelines</a>
+      <a href="#">Distribution partners</a>
+      <p class="foot-note">The story aspect of the Emporium — creation to publication under one roof.</p>
+    </div>
+    <div>
+      <h4>Catalog</h4>
+      <a href="#">Manga</a>
+      <a href="#">Comics</a>
+      <a href="#">Light novels</a>
+      <a href="#">Artbooks</a>
+    </div>
+    <div>
+      <h4>Tags</h4>
+      <a href="#">#manga</a>
+      <a href="#">#comics</a>
+      <a href="#">#lightnovel</a>
+      <a href="#">#artbook</a>
+    </div>
+    <div>
+      <h4>Stay on the shelf</h4>
+      <p style="font-size:13px; color:rgba(255,255,255,.88); margin-bottom:8px;">New releases, straight to your inbox.</p>
+      <button class="newsletter" type="button">Join the list</button>
+    </div>
+  </div>
+  <div class="foot-base">BENNY'S EMPORIUM · PUBLISHING HUB — prototype catalog · all titles, prices &amp; ratings are sample data</div>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>
